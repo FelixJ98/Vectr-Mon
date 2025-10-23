@@ -178,7 +178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _monoscopic: 0
   _sharpenType: 0
-  _enableDynamicResolution: 0
+  _enableDynamicResolution: 1
   minDynamicResolutionScale: 1
   maxDynamicResolutionScale: 1
   quest2MinDynamicResolutionScale: 0.7
@@ -228,7 +228,7 @@ MonoBehaviour:
   requestBodyTrackingPermissionOnStartup: 0
   requestFaceTrackingPermissionOnStartup: 0
   requestEyeTrackingPermissionOnStartup: 0
-  requestScenePermissionOnStartup: 0
+  requestScenePermissionOnStartup: 1
   requestRecordAudioPermissionOnStartup: 0
   _localDimming: 1
   _trackingOriginType: 1
@@ -454,7 +454,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11ef6fa5d790a04448172aff301a3459, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrackableManager
-  trackedObjectPrefab: {fileID: 0}
+  trackedObjectPrefab: {fileID: 5304135656924426891, guid: e168e7e619e46a140ad1ede16fac1756,
+    type: 3}
 --- !u!1 &177637164
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,7 +528,7 @@ MonoBehaviour:
   - WallU: 5
     WallV: 2
     AnchorUV: 1
-  Labels: 442367
+  Labels: 49151
 --- !u!114 &197322824
 MonoBehaviour:
   m_ObjectHideFlags: 0
