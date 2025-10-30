@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 public class SpawnCube : MonoBehaviour
@@ -27,9 +28,12 @@ public class SpawnCube : MonoBehaviour
     public IEnumerator spawnCube()
     {
         ONCEONLY = true;
-        Instantiate(theCube, this.transform.position, Quaternion.Euler(0, 0, 0));
+        //Instantiate(theCube, this.transform.position, Quaternion.Euler(0, 0, 0));
+        var instance = Instantiate(theCube, this.transform.position, Quaternion.Euler(0, 0, 0));
+        var instanceNetworkObject = instance.GetComponent<NetworkObject>();
+        instanceNetworkObject.Spawn();
         Debug.LogWarning("FIRED2");
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(1f);
         ONCEONLY = false;
         Debug.LogWarning("Refreshed");
     }
