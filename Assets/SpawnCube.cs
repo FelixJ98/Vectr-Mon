@@ -2,39 +2,41 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public class SpawnCube : MonoBehaviour
+public class SpawnCube : NetworkBehaviour
 {
-    public GameObject theCube = null;
-    private bool ONCEONLY = false;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] private GameObject theCube;
+    private bool onceOnly = false;
 
-    // Update is called once per frame
     void Update()
     {
-        if (OVRInput.Get(OVRInput.RawButton.A))
+        // Every player can press A
+        //if (!IsOwner) return;
+
+        if (OVRInput.GetDown(OVRInput.RawButton.A))
         {
-            Debug.LogWarning("FIRED");
-            if (theCube != null && !ONCEONLY)
+            if (!onceOnly && theCube != null)
             {
-                StartCoroutine(spawnCube());
+                StartCoroutine(SpawnCubeRoutine());
             }
         }
     }
 
-    public IEnumerator spawnCube()
+    private IEnumerator SpawnCubeRoutine()
     {
-        ONCEONLY = true;
-        //Instantiate(theCube, this.transform.position, Quaternion.Euler(0, 0, 0));
-        var instance = Instantiate(theCube, this.transform.position, Quaternion.Euler(0, 0, 0));
-        var instanceNetworkObject = instance.GetComponent<NetworkObject>();
-        instanceNetworkObject.Spawn();
-        Debug.LogWarning("FIRED2");
+        onceOnly = true;
+
+        // Ask the host to spawn the cube
+        RequestSpawnServerRpc(transform.position);
+
         yield return new WaitForSeconds(1f);
-        ONCEONLY = false;
-        Debug.LogWarning("Refreshed");
+        onceOnly = false;
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    void RequestSpawnServerRpc(Vector3 position, ServerRpcParams rpcParams = default)
+    {
+        GameObject instance = Instantiate(theCube, position, Quaternion.identity);
+        instance.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+    }
+
 }
