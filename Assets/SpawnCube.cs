@@ -29,7 +29,7 @@ public class SpawnCube : MonoBehaviour
         ONCEONLY = true;
         Instantiate(theCube, this.transform.position, Quaternion.Euler(0, 0, 0));
         Debug.LogWarning("FIRED2");
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(.5f);
         ONCEONLY = false;
         Debug.LogWarning("Refreshed");
     }
