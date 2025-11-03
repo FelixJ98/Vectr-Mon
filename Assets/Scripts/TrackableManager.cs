@@ -1,10 +1,14 @@
 using Meta.XR.MRUtilityKit;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class TrackableManager : MonoBehaviour
+public class TrackableManager : NetworkBehaviour
 {
-    [SerializeField] private GameObject trackedObjectPrefab;
-
+    
+    public UnityEvent<Transform> onTrackableAdded;
+    public UnityEvent<Transform> onTrackableRemoved;
+    
     // Called by MR Utility Kit's TrackableAdded event
     public void OnTrackableAdded(MRUKTrackable trackable)
     {
@@ -19,17 +23,10 @@ public class TrackableManager : MonoBehaviour
         if (trackable.TrackableType == OVRAnchor.TrackableType.QRCode)
         {
             string payload = trackable.MarkerPayloadString;
+           
             Debug.Log($"[TrackableManager] Detected QR code payload: {payload}");
 
-            if (trackedObjectPrefab != null)
-            {
-                GameObject instance = Instantiate(trackedObjectPrefab, trackable.transform);
-                Debug.Log($"[TrackableManager] Spawned prefab '{trackedObjectPrefab.name}' under QR code '{trackable.name}'.");
-            }
-            else
-            {
-                Debug.LogWarning("[TrackableManager] trackedObjectPrefab is not assigned.");
-            }
+            onTrackableAdded.Invoke(trackable.transform);
         }
     }
 
@@ -43,6 +40,7 @@ public class TrackableManager : MonoBehaviour
         }
 
         Debug.Log($"[TrackableManager] Removed trackable of type: {trackable.TrackableType}, GameObject: {trackable.gameObject.name}");
-        Destroy(trackable.gameObject);
+
+        onTrackableRemoved.Invoke(trackable.transform);
     }
 }
