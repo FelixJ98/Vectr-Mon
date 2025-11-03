@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class TrackableManager : NetworkBehaviour
+public class TrackableManager : MonoBehaviour
 {
     
     public UnityEvent<Transform> onTrackableAdded;
