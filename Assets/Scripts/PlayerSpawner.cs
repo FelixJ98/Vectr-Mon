@@ -13,10 +13,6 @@ public class PlayerManager : NetworkBehaviour
 
     private void Awake()
     {
-        // Ignore on non-server instances
-        if (!IsServer)
-            return;
-
         // Subscribe to trackable events
         trackableManager.onTrackableAdded.AddListener(TrackableAdded);
         trackableManager.onTrackableRemoved.AddListener(TrackableRemoved);
@@ -24,10 +20,6 @@ public class PlayerManager : NetworkBehaviour
 
     new void OnDestroy()
     {
-        // Ignore on non-server instances
-        if (!IsServer)
-            return;
-        
         // Unsubscribe to trackable events
         base.OnDestroy();
         trackableManager.onTrackableAdded.AddListener(TrackableAdded);
@@ -36,6 +28,12 @@ public class PlayerManager : NetworkBehaviour
 
     void TrackableAdded(Transform trackableTransform)
     {
+        Debug.Log($"[PlayerSpawner] Trackable Added: {trackableTransform.name}, isServer {IsServer}");
+
+        // Ignore on non-server instances
+        if (!IsServer)
+            return;
+
         // Spawn a player under the added trackable
         GameObject instance = Instantiate(playerPrefab, trackableTransform);
         spawnedPlayers.Add(instance);
@@ -45,6 +43,12 @@ public class PlayerManager : NetworkBehaviour
 
     private void TrackableRemoved(Transform trackableTransform)
     {
+        Debug.Log($"[PlayerSpawner] Trackable removed: {trackableTransform.name}, isServer {IsServer}");
+        
+        // Ignore on non-server instances
+        if (!IsServer)
+            return;
+
         // Destroy the spawned players associated with the removed trackable
         foreach (var player in spawnedPlayers)
         {
