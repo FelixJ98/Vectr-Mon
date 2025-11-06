@@ -750,7 +750,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1300829555
+  GlobalObjectIdHash: 3194511970
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2280,7 +2280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1486093600
+  GlobalObjectIdHash: 557454616
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
@@ -2498,7 +2498,7 @@ PrefabInstance:
     - target: {fileID: 7694273041120059082, guid: 8f730454be52f52418edbe1a06ebd496,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1567796278
+      value: 1266748649
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

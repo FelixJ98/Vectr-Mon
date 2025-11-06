@@ -750,7 +750,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1300829555
+  GlobalObjectIdHash: 2353727901
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1854,19 +1854,7 @@ MonoBehaviour:
           m_CallState: 2
     <TrackableRemoved>k__BackingField:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 983386358}
-          m_TargetAssemblyTypeName: TrackableManager, Assembly-CSharp
-          m_MethodName: OnTrackableRemoved
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
   _immersiveSceneDebuggerPrefab: {fileID: 7641788235762528044, guid: 950d12aea00a70449b5b7b746f142acf,
     type: 3}
 --- !u!114 &983386356
@@ -1916,7 +1904,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrackableManager
   trackedObjectPrefab: {fileID: 5304135656924426891, guid: e168e7e619e46a140ad1ede16fac1756,
     type: 3}
-  spo: {fileID: 0}
 --- !u!1 &995444447
 GameObject:
   m_ObjectHideFlags: 0
@@ -2280,7 +2267,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1486093600
+  GlobalObjectIdHash: 2582514346
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
@@ -2498,7 +2485,7 @@ PrefabInstance:
     - target: {fileID: 7694273041120059082, guid: 8f730454be52f52418edbe1a06ebd496,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1567796278
+      value: 3253248801
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

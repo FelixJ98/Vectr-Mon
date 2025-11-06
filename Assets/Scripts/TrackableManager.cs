@@ -2,11 +2,22 @@ using Meta.XR.MRUtilityKit;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using static Oculus.Interaction.Context;
 
 public class TrackableManager : MonoBehaviour
 {
     [SerializeField] private GameObject trackedObjectPrefab;
+    public GameObject spo; //SpawnedTrackedObject
+    private MRUKTrackable trackable;
     private bool onceOnly = false;
+
+    private void Update()
+    {
+        if (spo != null) {
+            spo.transform.position = trackable.transform.position;
+            spo.transform.rotation = trackable.transform.rotation;
+        }
+    }
 
 
     // Called by MR Utility Kit's TrackableAdded event
@@ -17,7 +28,7 @@ public class TrackableManager : MonoBehaviour
             Debug.LogWarning("[TrackableManager] OnTrackableAdded called with null trackable!");
             return;
         }
-
+        this.trackable = trackable;
         Debug.Log($"[TrackableManager] Added trackable of type: {trackable.TrackableType}, GameObject: {trackable.gameObject.name}");
 
         if (trackable.TrackableType == OVRAnchor.TrackableType.QRCode)
@@ -49,7 +60,7 @@ public class TrackableManager : MonoBehaviour
             Debug.LogWarning("[TrackableManager] OnTrackableRemoved called with null trackable!");
             return;
         }
-
+        trackable = this.trackable;
         Debug.Log($"[TrackableManager] Removed trackable of type: {trackable.TrackableType}, GameObject: {trackable.gameObject.name}");
         Destroy(trackable.gameObject);
     }
@@ -59,17 +70,19 @@ public class TrackableManager : MonoBehaviour
         onceOnly = true;
 
         // Ask the host to spawn the cube
-        RequestSpawnServerRpc(transform.position);
+        RequestSpawnServerRpc(trackable.transform.position, trackable.transform.rotation);
 
         yield return new WaitForSeconds(1f);
         onceOnly = false;
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void RequestSpawnServerRpc(Vector3 position, ServerRpcParams rpcParams = default)
+    void RequestSpawnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
-        GameObject instance = Instantiate(trackedObjectPrefab, position, Quaternion.identity);
-        instance.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+        //GameObject instance = Instantiate(trackedObjectPrefab, position, rotation);
+        spo = Instantiate(trackedObjectPrefab, position, rotation);
+        //instance.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+        spo.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
     }
 }
 
@@ -79,7 +92,8 @@ public class TrackableManager : MonoBehaviour
 
 
 // Method does not work
-/*public class TrackableManager : NetworkBehaviour
+/*
+public class TrackableManager : NetworkBehaviour
 {
     [SerializeField] private GameObject trackedObjectPrefab;
     private bool onceOnly = false;
@@ -162,4 +176,5 @@ public class TrackableManager : MonoBehaviour
             Debug.Log($"[TrackableManager] Attached spawned prefab '{netObj.name}' to QR '{target.name}' locally.");
         }
     }
-}*/
+}
+*/
