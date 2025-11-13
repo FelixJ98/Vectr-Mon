@@ -8,7 +8,7 @@ public class TrackableManager : MonoBehaviour
     // Called by MR Utility Kit's TrackableAdded event
     public void OnTrackableAdded(MRUKTrackable trackable)
     {
-        if (trackable == null)
+        if (trackable == null) 
         {
             Debug.LogWarning("[TrackableManager] OnTrackableAdded called with null trackable!");
             return;
