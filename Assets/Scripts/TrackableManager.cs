@@ -1,27 +1,26 @@
 using Meta.XR.MRUtilityKit;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using static Oculus.Interaction.Context;
 
 public class TrackableManager : MonoBehaviour
 {
     [SerializeField] private GameObject trackedObjectPrefab;
+    [SerializeField] Dictionary<string, GameObject[]> trackedObjects = new Dictionary<string, GameObject[]>();
+    NetworkList<FixedString512Bytes> keys = new NetworkList<FixedString512Bytes>();
     public GameObject spo; //SpawnedTrackedObject
     private MRUKTrackable trackable;
-    private bool onceOnly = false;
-
+    //private bool onceOnly = false;
     private void Update()
     {
-        if (spo != null) {
-            spo.transform.position = trackable.transform.position;
-            spo.transform.rotation = trackable.transform.rotation;
-        }
+        UpdateObjectLocationServerRpc();
     }
 
 
     // Called by MR Utility Kit's TrackableAdded event
-    public void OnTrackableAdded(MRUKTrackable trackable)
+    /*public void OnTrackableAdded(MRUKTrackable trackable)
     {
         if (trackable == null)
         {
@@ -50,6 +49,36 @@ public class TrackableManager : MonoBehaviour
                 Debug.LogWarning("[TrackableManager] trackedObjectPrefab is not assigned.");
             }
         }
+    }*/
+
+    public void OnTrackableAdded(MRUKTrackable trackable)
+    {
+        if (trackable == null)
+        {
+            Debug.LogWarning("[TrackableManager] OnTrackableAdded called with null trackable!");
+            return;
+        }
+        this.trackable = trackable;
+        Debug.Log($"[TrackableManager] Added trackable of type: {trackable.TrackableType}, GameObject: {trackable.gameObject.name}");
+
+        if (trackable.TrackableType == OVRAnchor.TrackableType.QRCode)
+        {
+            string payload = trackable.MarkerPayloadString;
+            Debug.Log($"[TrackableManager] Detected QR code payload: {payload}");
+
+            if (!keys.Contains(payload))
+            {
+                GameObject spawned = SpawnAndReturnServerRpc(trackable.transform.position, trackable.transform.rotation);
+                GameObject[] spawnedObjects = { spawned, trackable.gameObject};
+                trackedObjects.Add(payload, spawnedObjects);
+                keys.Add(payload);
+                Debug.Log($"[TrackableManager] Spawned prefab '{trackedObjectPrefab.name}' under QR code '{trackable.name}'.");
+            }
+            else
+            {
+                Debug.LogWarning("It was found?");
+            }
+        }
     }
 
     // Called by MR Utility Kit's TrackableRemoved event
@@ -65,7 +94,7 @@ public class TrackableManager : MonoBehaviour
         Destroy(trackable.gameObject);
     }
 
-    private IEnumerator SpawnCubeRoutine()
+    /*private IEnumerator SpawnCubeRoutine()
     {
         onceOnly = true;
 
@@ -83,6 +112,29 @@ public class TrackableManager : MonoBehaviour
         spo = Instantiate(trackedObjectPrefab, position, rotation);
         //instance.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
         spo.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+    }*/
+
+    [ServerRpc(RequireOwnership = false)]
+    GameObject SpawnAndReturnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
+    {
+        //GameObject instance = Instantiate(trackedObjectPrefab, position, rotation);
+        spo = Instantiate(trackedObjectPrefab, position, rotation);
+        //instance.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+        spo.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+
+        return spo;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void UpdateObjectLocationServerRpc(ServerRpcParams rpcParams = default)
+    {
+        if (trackedObjects.Count != 0)
+        {
+            foreach(GameObject[] g in trackedObjects.Values)
+            {
+                g[0].GetComponent<NetworkObject>().transform.position = g[1].transform.position;
+            }
+        }
     }
 }
 
