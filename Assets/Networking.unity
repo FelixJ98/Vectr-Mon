@@ -1154,7 +1154,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &314499794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2757,6 +2757,7 @@ GameObject:
   - component: {fileID: 1393930608}
   - component: {fileID: 1393930611}
   - component: {fileID: 1393930612}
+  - component: {fileID: 1393930613}
   m_Layer: 3
   m_Name: Canvas
   m_TagString: Untagged
@@ -2837,7 +2838,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 2
   m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -2888,8 +2889,27 @@ MonoBehaviour:
   shape: 0
   curveRadius: 1
   overlapMask: 0
-  overlayType: 1
+  overlayType: 2
   _overlayEnabled: 1
+--- !u!114 &1393930613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1393930606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aaf960227867044282d921171d2d7ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.VR::OVRRaycaster
+  m_IgnoreReversedGraphics: 0
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  pointer: {fileID: 0}
+  sortOrder: 0
 --- !u!1 &1461057747
 GameObject:
   m_ObjectHideFlags: 0
@@ -3165,7 +3185,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1915624300
 Transform:
   m_ObjectHideFlags: 0
@@ -3188,7 +3208,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1915624297}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d4ab4409f16314eda964ef497316335a, type: 3}
   m_Name: 
