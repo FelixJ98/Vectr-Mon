@@ -754,7 +754,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1300829555
+  GlobalObjectIdHash: 625645250
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2136,7 +2136,7 @@ MonoBehaviour:
     SceneJson: 
     <TrackerConfiguration>k__BackingField:
       <KeyboardTrackingEnabled>k__BackingField: 0
-      <QRCodeTrackingEnabled>k__BackingField: 1
+      <QRCodeTrackingEnabled>k__BackingField: 0
     <TrackableAdded>k__BackingField:
       m_PersistentCalls:
         m_Calls:
@@ -3011,7 +3011,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1486093600
+  GlobalObjectIdHash: 3482718532
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
@@ -3334,54 +3334,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1948393584}
   m_CullTransparentMesh: 1
---- !u!1 &2056439134
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2056439136}
-  - component: {fileID: 2056439135}
-  m_Layer: 0
-  m_Name: CompatibilityManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2056439135
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2056439134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f1046e9685ae40e99d53c3bada7ed6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkCompatibilityManager
-  compatibilityVersion: 1.0.0
-  forceProtocolVersion: 1
-  enforcedProtocolVersion: 1
-  logCompatibilityInfo: 1
---- !u!4 &2056439136
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2056439134}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.266, z: 7}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2129198167
 GameObject:
   m_ObjectHideFlags: 0
@@ -3543,7 +3495,7 @@ PrefabInstance:
     - target: {fileID: 7694273041120059082, guid: 8f730454be52f52418edbe1a06ebd496,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1567796278
+      value: 3048709626
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3570,4 +3522,3 @@ SceneRoots:
   - {fileID: 1076321770}
   - {fileID: 1915624300}
   - {fileID: 314499796}
-  - {fileID: 2056439136}

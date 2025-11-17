@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Reflection;
 
 public class ConnectionUI : MonoBehaviour
 {
@@ -10,6 +11,16 @@ public class ConnectionUI : MonoBehaviour
     private float updateTimer = 0f;
     private float waitingTimer = 0f;
     private bool hasShownWaitingMessage = false;
+
+    // Cache application info to avoid repeated reflection calls
+    private string cachedAppVersion;
+    private string cachedBuildGUID;
+    private string cachedOculusAppID;
+    private uint cachedProtocolVersion;
+    private bool hasLoggedConnectionInfo = false;
+    
+    // Reference to compatibility manager
+    private NetworkCompatibilityManager compatibilityManager;
 
     private void Start()
     {
@@ -25,7 +36,94 @@ public class ConnectionUI : MonoBehaviour
             return;
         }
 
+        // Find compatibility manager
+        compatibilityManager = FindObjectOfType<NetworkCompatibilityManager>();
+        
+        // Cache application information once at startup
+        CacheApplicationInfo();
+        
+        // Log connection parameters for debugging
+        LogConnectionParameters();
+        
         UpdateStatusText();
+    }
+
+    private void CacheApplicationInfo()
+    {
+        // Get Unity application version
+        cachedAppVersion = Application.version;
+        
+        // Get build GUID (unique per build) - this changes with each build
+        cachedBuildGUID = Application.buildGUID;
+        
+        // Cache protocol version from NetworkManager if available
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.NetworkConfig != null)
+        {
+            cachedProtocolVersion = NetworkManager.Singleton.NetworkConfig.ProtocolVersion;
+        }
+        
+        // Try to get Oculus App ID from Resources
+        try
+        {
+            var oculusSettings = Resources.Load<ScriptableObject>("OculusPlatformSettings");
+            if (oculusSettings != null)
+            {
+                // Use reflection to access the App ID field
+                var appIdField = oculusSettings.GetType().GetField("ovrAppID", BindingFlags.Public | BindingFlags.Instance);
+                if (appIdField != null)
+                {
+                    var appIdValue = appIdField.GetValue(oculusSettings);
+                    cachedOculusAppID = appIdValue?.ToString() ?? "N/A";
+                }
+                else
+                {
+                    cachedOculusAppID = "Reflection Failed";
+                }
+            }
+            else
+            {
+                cachedOculusAppID = "Not Found";
+            }
+        }
+        catch (System.Exception ex)
+        {
+            cachedOculusAppID = $"Error: {ex.Message}";
+            Debug.LogWarning($"[ConnectionUI] Could not load Oculus App ID: {ex.Message}");
+        }
+    }
+
+    private void LogConnectionParameters()
+    {
+        if (hasLoggedConnectionInfo) return;
+        
+        Debug.Log("=== [ConnectionUI] Connection Parameters ===");
+        Debug.Log($"[ConnectionUI] Application Version: {cachedAppVersion}");
+        Debug.Log($"[ConnectionUI] Build GUID: {cachedBuildGUID}");
+        Debug.Log($"[ConnectionUI] Oculus App ID: {cachedOculusAppID}");
+        Debug.Log($"[ConnectionUI] Protocol Version: {cachedProtocolVersion}");
+        
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.NetworkConfig != null)
+        {
+            var config = NetworkManager.Singleton.NetworkConfig;
+            Debug.Log($"[ConnectionUI] NetworkConfig ProtocolVersion: {config.ProtocolVersion}");
+            Debug.Log($"[ConnectionUI] ForceSamePrefabs: {config.ForceSamePrefabs}");
+            
+            // Warning about protocol version
+            if (config.ProtocolVersion == 0)
+            {
+                Debug.LogWarning("[ConnectionUI] WARNING: Protocol Version is 0. Different builds may not be able to connect. " +
+                    "Consider incrementing ProtocolVersion when making breaking network changes.");
+            }
+            
+            // Warning about ForceSamePrefabs
+            if (!config.ForceSamePrefabs)
+            {
+                Debug.LogWarning("[ConnectionUI] WARNING: ForceSamePrefabs is disabled. Clients with different prefab versions may cause connection issues.");
+            }
+        }
+        
+        Debug.Log("=== [ConnectionUI] End Connection Parameters ===");
+        hasLoggedConnectionInfo = true;
     }
 
     private void Update()
@@ -68,8 +166,12 @@ public class ConnectionUI : MonoBehaviour
         string clientInfo = GetClientInfo(netManager);
         string roomInfo = GetRoomInfo(netManager);
         string matchmakingInfo = GetMatchmakingInfo(netManager);
+        string appInfo = GetApplicationInfo(netManager);
+        string protocolInfo = GetProtocolInfo(netManager);
+        string transportInfo = GetTransportInfo(netManager);
+        string compatibilityInfo = GetCompatibilityInfo();
 
-        statusText.text = $"{status}\n{clientInfo}\n{roomInfo}\n{matchmakingInfo}";
+        statusText.text = $"{status}\n{clientInfo}\n{roomInfo}\n{matchmakingInfo}\n{appInfo}\n{protocolInfo}\n{transportInfo}\n{compatibilityInfo}";
     }
 
     private string GetMatchmakingInfo(NetworkManager netManager)
@@ -88,6 +190,95 @@ public class ConnectionUI : MonoBehaviour
         }
         return "Connecting...";
 #endif
+    }
+
+    private string GetApplicationInfo(NetworkManager netManager)
+    {
+        string info = $"App Version: {cachedAppVersion}";
+        
+        // Show build GUID (first 8 chars for readability)
+        if (!string.IsNullOrEmpty(cachedBuildGUID))
+        {
+            string shortGUID = cachedBuildGUID.Length > 8 ? cachedBuildGUID.Substring(0, 8) : cachedBuildGUID;
+            info += $"\nBuild GUID: {shortGUID}...";
+        }
+        
+        // Show Oculus App ID
+        if (!string.IsNullOrEmpty(cachedOculusAppID))
+        {
+            info += $"\nOculus App ID: {cachedOculusAppID}";
+        }
+        
+        return info;
+    }
+
+    private string GetProtocolInfo(NetworkManager netManager)
+    {
+        if (netManager.NetworkConfig == null)
+        {
+            return "Protocol: Config Not Available";
+        }
+
+        uint protocolVersion = netManager.NetworkConfig.ProtocolVersion;
+        string protocolText = $"Protocol Version: {protocolVersion}";
+        
+        // Add warning indicator if protocol version is 0
+        if (protocolVersion == 0)
+        {
+            protocolText += " ⚠️ (May block cross-build connections)";
+        }
+        
+        return protocolText;
+    }
+
+    private string GetTransportInfo(NetworkManager netManager)
+    {
+        if (netManager.NetworkConfig?.NetworkTransport == null)
+        {
+            return "Transport: Not Available";
+        }
+
+        var transport = netManager.NetworkConfig.NetworkTransport;
+        string transportType = transport.GetType().Name;
+        
+        // Try to get connection data if available
+        string connectionInfo = "";
+        try
+        {
+            // Use reflection to access ConnectionData if it exists
+            var connectionDataField = transport.GetType().GetField("ConnectionData", BindingFlags.Public | BindingFlags.Instance);
+            if (connectionDataField != null)
+            {
+                var connectionData = connectionDataField.GetValue(transport);
+                if (connectionData != null)
+                {
+                    var addressField = connectionData.GetType().GetField("Address", BindingFlags.Public | BindingFlags.Instance);
+                    var portField = connectionData.GetType().GetField("Port", BindingFlags.Public | BindingFlags.Instance);
+                    
+                    if (addressField != null && portField != null)
+                    {
+                        string address = addressField.GetValue(connectionData)?.ToString() ?? "N/A";
+                        string port = portField.GetValue(connectionData)?.ToString() ?? "N/A";
+                        connectionInfo = $" ({address}:{port})";
+                    }
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[ConnectionUI] Could not read transport connection data: {ex.Message}");
+        }
+
+        return $"Transport: {transportType}{connectionInfo}";
+    }
+
+    private string GetCompatibilityInfo()
+    {
+        if (compatibilityManager != null)
+        {
+            return $"Compatibility: {compatibilityManager.CompatibilityVersion} (Protocol: {compatibilityManager.EnforcedProtocolVersion})";
+        }
+        return "Compatibility: Not Managed";
     }
 
     private string GetConnectionStatus(NetworkManager netManager)
