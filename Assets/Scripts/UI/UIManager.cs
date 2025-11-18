@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 /// <summary>
 /// UIManager - Central controller for managing UI flow in the Meta Quest game.
@@ -18,6 +19,19 @@ public class UIManager : MonoBehaviour
 
     [Tooltip("BattleField Menu Canvas - Combat interface")]
     public GameObject battleFieldMenuCanvas;
+
+    [Header("Character Spawning")]
+    [Tooltip("Character A prefab to instantiate when character selection is confirmed. Must have a NetworkObject component.")]
+    [SerializeField]
+    private NetworkObject characterA;
+
+    [Tooltip("Spawn position offset relative to this GameObject's transform. If not set, will spawn at this transform's position.")]
+    [SerializeField]
+    private Vector3 spawnPositionOffset = Vector3.zero;
+
+    [Tooltip("Spawn rotation offset relative to this GameObject's transform rotation. If not set, will use this transform's rotation.")]
+    [SerializeField]
+    private Vector3 spawnRotationOffset = Vector3.zero;
 
     // Singleton pattern for easy access from other scripts
     public static UIManager Instance { get; private set; }
@@ -51,7 +65,7 @@ public class UIManager : MonoBehaviour
     public void ShowMainMenu()
     {
         SetActiveCanvas(mainMenuCanvas);
-        Debug.Log("UIManager: Main Menu displayed");
+        DebugTag.Log(nameof(UIManager), "Main Menu displayed");
     }
 
     /// <summary>
@@ -61,7 +75,7 @@ public class UIManager : MonoBehaviour
     public void ShowSelectionMenu()
     {
         SetActiveCanvas(selectionCanvas);
-        Debug.Log("UIManager: Character Selection displayed");
+        DebugTag.Log(nameof(UIManager), "Character Selection displayed");
     }
 
     /// <summary>
@@ -71,7 +85,7 @@ public class UIManager : MonoBehaviour
     public void ShowBattleFieldMenu()
     {
         SetActiveCanvas(battleFieldMenuCanvas);
-        Debug.Log("UIManager: BattleField Menu displayed");
+        DebugTag.Log(nameof(UIManager), "BattleField Menu displayed");
     }
 
     // ===== Helper Methods =====
@@ -105,13 +119,60 @@ public class UIManager : MonoBehaviour
 
     /// <summary>
     /// Called when character selection is confirmed
-    /// Transitions to BattleField Menu
-    /// TODO: Pass selected character data to battle system
+    /// Transitions to BattleField Menu and spawns the selected character as a NetworkObject
     /// </summary>
     public void OnCharacterConfirmed()
     {
         ShowBattleFieldMenu();
-        // TODO: Initialize battle with selected characters
+        
+        // Spawn character as NetworkObject
+        SpawnCharacterA();
+    }
+
+    /// <summary>
+    /// Spawns Character A as a networked object. Only the server can spawn NetworkObjects.
+    /// </summary>
+    private void SpawnCharacterA()
+    {
+        // Check if NetworkManager is available
+        if (NetworkManager.Singleton == null)
+        {
+            DebugTag.LogWarning(nameof(UIManager), "Cannot spawn character: NetworkManager.Singleton is null. " +
+                           "Ensure NetworkManager is present in the scene.");
+            return;
+        }
+
+        // Only server can spawn NetworkObjects
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            DebugTag.LogWarning(nameof(UIManager), "Cannot spawn character: Only the server can spawn NetworkObjects. " +
+                           $"Current role: {(NetworkManager.Singleton.IsClient ? "Client" : "Not Connected")}");
+            return;
+        }
+
+        // Validate character prefab
+        if (characterA == null)
+        {
+            DebugTag.LogWarning(nameof(UIManager), "Cannot spawn character: characterA prefab is not assigned. " +
+                           "Please assign a NetworkObject prefab in the Inspector.");
+            return;
+        }
+
+        // Calculate world position relative to this transform
+        Vector3 worldSpawnPosition = transform.TransformPoint(spawnPositionOffset);
+        
+        // Calculate world rotation relative to this transform
+        Quaternion worldSpawnRotation = transform.rotation * Quaternion.Euler(spawnRotationOffset);
+
+        // Instantiate the character prefab at the calculated world position and rotation
+        NetworkObject instance = Instantiate(characterA, worldSpawnPosition, worldSpawnRotation);
+        
+        // Spawn with server ownership (no client ownership)
+        instance.SpawnWithOwnership(NetworkManager.ServerClientId);
+
+        DebugTag.Log(nameof(UIManager), $"Character A spawned at world position {worldSpawnPosition} (local offset: {spawnPositionOffset}) " +
+                   $"with rotation {worldSpawnRotation.eulerAngles} (local offset: {spawnRotationOffset}). " +
+                   $"NetworkObjectId: {instance.NetworkObjectId}");
     }
 
     /// <summary>

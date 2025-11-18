@@ -32,7 +32,7 @@ public class NetworkCompatibilityManager : MonoBehaviour
         // Singleton pattern
         if (instance != null && instance != this)
         {
-            Debug.LogWarning("[NetworkCompatibilityManager] Multiple instances detected. Destroying duplicate.");
+            DebugTag.LogWarning(nameof(NetworkCompatibilityManager), "Multiple instances detected. Destroying duplicate.");
             Destroy(this);
             return;
         }
@@ -53,13 +53,13 @@ public class NetworkCompatibilityManager : MonoBehaviour
     {
         if (NetworkManager.Singleton == null)
         {
-            Debug.LogWarning("[NetworkCompatibilityManager] NetworkManager.Singleton is null. Cannot apply compatibility settings.");
+            DebugTag.LogWarning(nameof(NetworkCompatibilityManager), "NetworkManager.Singleton is null. Cannot apply compatibility settings.");
             return;
         }
         
         if (NetworkManager.Singleton.NetworkConfig == null)
         {
-            Debug.LogWarning("[NetworkCompatibilityManager] NetworkConfig is null. Cannot apply compatibility settings.");
+            DebugTag.LogWarning(nameof(NetworkCompatibilityManager), "NetworkConfig is null. Cannot apply compatibility settings.");
             return;
         }
         
@@ -73,7 +73,7 @@ public class NetworkCompatibilityManager : MonoBehaviour
             
             if (logCompatibilityInfo)
             {
-                Debug.Log($"[NetworkCompatibilityManager] Protocol Version overridden: {originalProtocolVersion} -> {enforcedProtocolVersion}");
+                DebugTag.Log(nameof(NetworkCompatibilityManager), $"Protocol Version overridden: {originalProtocolVersion} -> {enforcedProtocolVersion}");
             }
         }
         
@@ -88,20 +88,20 @@ public class NetworkCompatibilityManager : MonoBehaviour
     /// </summary>
     private void LogCompatibilityInfo()
     {
-        Debug.Log("=== [NetworkCompatibilityManager] Compatibility Information ===");
-        Debug.Log($"[NetworkCompatibilityManager] Compatibility Version: {compatibilityVersion}");
-        Debug.Log($"[NetworkCompatibilityManager] Force Protocol Version: {forceProtocolVersion}");
-        Debug.Log($"[NetworkCompatibilityManager] Enforced Protocol Version: {enforcedProtocolVersion}");
+        DebugTag.Log(nameof(NetworkCompatibilityManager), "=== Compatibility Information ===");
+        DebugTag.Log(nameof(NetworkCompatibilityManager), $"Compatibility Version: {compatibilityVersion}");
+        DebugTag.Log(nameof(NetworkCompatibilityManager), $"Force Protocol Version: {forceProtocolVersion}");
+        DebugTag.Log(nameof(NetworkCompatibilityManager), $"Enforced Protocol Version: {enforcedProtocolVersion}");
         
         if (NetworkManager.Singleton != null && NetworkManager.Singleton.NetworkConfig != null)
         {
             var config = NetworkManager.Singleton.NetworkConfig;
-            Debug.Log($"[NetworkCompatibilityManager] Current NetworkConfig ProtocolVersion: {config.ProtocolVersion}");
-            Debug.Log($"[NetworkCompatibilityManager] Application Build GUID: {Application.buildGUID}");
-            Debug.Log($"[NetworkCompatibilityManager] Application Version: {Application.version}");
+            DebugTag.Log(nameof(NetworkCompatibilityManager), $"Current NetworkConfig ProtocolVersion: {config.ProtocolVersion}");
+            DebugTag.Log(nameof(NetworkCompatibilityManager), $"Application Build GUID: {Application.buildGUID}");
+            DebugTag.Log(nameof(NetworkCompatibilityManager), $"Application Version: {Application.version}");
         }
         
-        Debug.Log("=== [NetworkCompatibilityManager] End Compatibility Information ===");
+        DebugTag.Log(nameof(NetworkCompatibilityManager), "=== End Compatibility Information ===");
     }
     
     /// <summary>
@@ -115,7 +115,7 @@ public class NetworkCompatibilityManager : MonoBehaviour
         
         if (!matches)
         {
-            Debug.LogWarning($"[NetworkCompatibilityManager] Compatibility version mismatch! " +
+            DebugTag.LogWarning(nameof(NetworkCompatibilityManager), $"Compatibility version mismatch! " +
                 $"Local: {compatibilityVersion}, Remote: {remoteCompatibilityVersion}");
         }
         
@@ -130,12 +130,12 @@ public class NetworkCompatibilityManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(version))
         {
-            Debug.LogWarning("[NetworkCompatibilityManager] Cannot set empty compatibility version.");
+            DebugTag.LogWarning(nameof(NetworkCompatibilityManager), "Cannot set empty compatibility version.");
             return;
         }
         
         compatibilityVersion = version;
-        Debug.Log($"[NetworkCompatibilityManager] Compatibility version set to: {compatibilityVersion}");
+        DebugTag.Log(nameof(NetworkCompatibilityManager), $"Compatibility version set to: {compatibilityVersion}");
     }
     
     /// <summary>
@@ -149,7 +149,7 @@ public class NetworkCompatibilityManager : MonoBehaviour
         if (forceProtocolVersion && NetworkManager.Singleton != null && NetworkManager.Singleton.NetworkConfig != null)
         {
             NetworkManager.Singleton.NetworkConfig.ProtocolVersion = enforcedProtocolVersion;
-            Debug.Log($"[NetworkCompatibilityManager] Protocol version set to: {enforcedProtocolVersion}");
+            DebugTag.Log(nameof(NetworkCompatibilityManager), $"Protocol version set to: {enforcedProtocolVersion}");
         }
     }
     

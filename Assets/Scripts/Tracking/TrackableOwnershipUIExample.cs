@@ -34,10 +34,6 @@ public class TrackableOwnershipUIExample : MonoBehaviour
     [SerializeField]
     private Button requestOwnershipButton;
 
-    [Tooltip("Optional: Text component to display ownership status.")]
-    [SerializeField]
-    private Text statusText;
-
     private Button _button;
 
     #region Unity Lifecycle
@@ -56,7 +52,7 @@ public class TrackableOwnershipUIExample : MonoBehaviour
 
         if (_button == null)
         {
-            Debug.LogError($"[TrackableOwnershipUIExample] No Button component found on {gameObject.name}.");
+            DebugTag.LogError(nameof(TrackableOwnershipUIExample), $"No Button component found on {gameObject.name}.");
             enabled = false;
             return;
         }
@@ -68,7 +64,7 @@ public class TrackableOwnershipUIExample : MonoBehaviour
             
             if (ownershipController == null)
             {
-                Debug.LogWarning($"[TrackableOwnershipUIExample] No TrackableOwnershipController found in scene. " +
+                DebugTag.LogWarning(nameof(TrackableOwnershipUIExample), $"No TrackableOwnershipController found in scene. " +
                                "Please assign one in the Inspector.");
             }
         }
@@ -80,19 +76,16 @@ public class TrackableOwnershipUIExample : MonoBehaviour
         if (_button != null && ownershipController != null)
         {
             _button.onClick.AddListener(OnButtonClicked);
-            Debug.Log($"[TrackableOwnershipUIExample] Button wired to request ownership.");
+            DebugTag.Log(nameof(TrackableOwnershipUIExample), "Button wired to request ownership.");
         }
 
-        // Subscribe to ownership events for UI updates
+        // Subscribe to ownership events for logging
         if (ownershipController != null)
         {
             ownershipController.onOwnershipTransferred.AddListener(OnOwnershipTransferred);
             ownershipController.onOwnershipDenied.AddListener(OnOwnershipDenied);
             ownershipController.onOwnershipReleased.AddListener(OnOwnershipReleased);
         }
-
-        // Initial status update
-        UpdateStatusText();
     }
 
     private void OnDestroy()
@@ -111,15 +104,6 @@ public class TrackableOwnershipUIExample : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        // Update status text periodically (optional, for real-time updates)
-        if (statusText != null && ownershipController != null && Time.frameCount % 60 == 0)
-        {
-            UpdateStatusText();
-        }
-    }
-
     #endregion
 
     #region Event Handlers
@@ -128,7 +112,7 @@ public class TrackableOwnershipUIExample : MonoBehaviour
     {
         if (ownershipController == null)
         {
-            Debug.LogWarning($"[TrackableOwnershipUIExample] Cannot request ownership: No TrackableOwnershipController assigned.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipUIExample), "Cannot request ownership: No TrackableOwnershipController assigned.");
             return;
         }
 
@@ -144,7 +128,7 @@ public class TrackableOwnershipUIExample : MonoBehaviour
     {
         if (ownershipController == null)
         {
-            Debug.LogWarning($"[TrackableOwnershipUIExample] Cannot perform action: No TrackableOwnershipController assigned.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipUIExample), "Cannot perform action: No TrackableOwnershipController assigned.");
             return;
         }
 
@@ -152,7 +136,7 @@ public class TrackableOwnershipUIExample : MonoBehaviour
         if (ownershipController.ValidateOwnership("PerformOwnerOnlyAction"))
         {
             // Your owner-only code here
-            Debug.Log($"[TrackableOwnershipUIExample] Performing owner-only action!");
+            DebugTag.Log(nameof(TrackableOwnershipUIExample), "Performing owner-only action!");
             // Example: Modify trackable, spawn objects, etc.
         }
     }
@@ -165,7 +149,7 @@ public class TrackableOwnershipUIExample : MonoBehaviour
     {
         if (ownershipController == null)
         {
-            Debug.LogWarning($"[TrackableOwnershipUIExample] Cannot perform action: No TrackableOwnershipController assigned.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipUIExample), "Cannot perform action: No TrackableOwnershipController assigned.");
             return;
         }
 
@@ -173,61 +157,24 @@ public class TrackableOwnershipUIExample : MonoBehaviour
         ownershipController.ExecuteIfOwner(() =>
         {
             // Your owner-only code here
-            Debug.Log($"[TrackableOwnershipUIExample] Performing owner-only action with wrapper!");
+            DebugTag.Log(nameof(TrackableOwnershipUIExample), "Performing owner-only action with wrapper!");
             // Example: Modify trackable, spawn objects, etc.
         }, "PerformOwnerOnlyActionWithWrapper");
     }
 
     private void OnOwnershipTransferred(ulong newOwnerId)
     {
-        Debug.Log($"[TrackableOwnershipUIExample] Ownership transferred to client {newOwnerId}.");
-        UpdateStatusText();
+        DebugTag.Log(nameof(TrackableOwnershipUIExample), $"Ownership transferred to client {newOwnerId}.");
     }
 
     private void OnOwnershipDenied(ulong deniedClientId)
     {
-        Debug.Log($"[TrackableOwnershipUIExample] Ownership request denied for client {deniedClientId}.");
-        UpdateStatusText();
+        DebugTag.Log(nameof(TrackableOwnershipUIExample), $"Ownership request denied for client {deniedClientId}.");
     }
 
     private void OnOwnershipReleased()
     {
-        Debug.Log($"[TrackableOwnershipUIExample] Ownership released.");
-        UpdateStatusText();
-    }
-
-    #endregion
-
-    #region UI Updates
-
-    private void UpdateStatusText()
-    {
-        if (statusText == null || ownershipController == null)
-        {
-            return;
-        }
-
-        if (!ownershipController.IsSpawned)
-        {
-            statusText.text = "Status: Not Spawned";
-            return;
-        }
-
-        ulong ownerId = ownershipController.GetCurrentOwnerId();
-        bool isLocalOwner = ownershipController.IsLocalClientOwner();
-
-        if (isLocalOwner)
-        {
-            statusText.text = "Status: You Own This";
-        }
-        else if (ownerId == NetworkManager.ServerClientId)
-        {
-            statusText.text = "Status: Available (Server Owned)";
-        }
-        else
-        {
-            statusText.text = $"Status: Owned by Client {ownerId}";
-        }
+        DebugTag.Log(nameof(TrackableOwnershipUIExample), "Ownership released.");
     }
 
     #endregion

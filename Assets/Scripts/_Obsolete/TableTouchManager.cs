@@ -21,7 +21,7 @@ public class TableTouchManager : MonoBehaviour
         var room = MRUK.Instance.GetCurrentRoom();
         if (room == null)
         {
-            Debug.LogWarning("TableTouchManager: No MRUK room found.");
+            DebugTag.LogWarning(nameof(TableTouchManager), "No MRUK room found.");
             return;
         }
 

@@ -45,7 +45,7 @@ public class OwnerOnlyUIInteractable : MonoBehaviour
 
         if (_selectable == null)
         {
-            Debug.LogWarning($"[OwnerOnlyUIInteractable] No Selectable component found on {gameObject.name}. " +
+            DebugTag.LogWarning(nameof(OwnerOnlyUIInteractable), $"No Selectable component found on {gameObject.name}. " +
                            "This component requires a Selectable (Button, Toggle, Slider, etc.) to function.");
             enabled = false;
             return;
@@ -63,7 +63,7 @@ public class OwnerOnlyUIInteractable : MonoBehaviour
 
             if (ownershipController == null)
             {
-                Debug.LogWarning($"[OwnerOnlyUIInteractable] No TrackableOwnershipController found. " +
+                DebugTag.LogWarning(nameof(OwnerOnlyUIInteractable), $"No TrackableOwnershipController found. " +
                                "Please assign one in the Inspector.");
                 enabled = false;
                 return;

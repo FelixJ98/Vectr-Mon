@@ -69,7 +69,7 @@ public class BattleFieldMenu : MonoBehaviour
     {
         if (panel == null)
         {
-            Debug.LogWarning("BattleFieldMenu: Panel reference is not set. Assign a RectTransform in the Inspector.");
+            DebugTag.LogWarning(nameof(BattleFieldMenu), "Panel reference is not set. Assign a RectTransform in the Inspector.");
             return;
         }
 
@@ -142,7 +142,7 @@ public class BattleFieldMenu : MonoBehaviour
     /// </summary>
     public void OnAttackClicked()
     {
-        Debug.Log("BattleFieldMenu: ATTACK button clicked! Attack beats Grab.");
+        DebugTag.Log(nameof(BattleFieldMenu), "ATTACK button clicked! Attack beats Grab.");
         _playerChoice = Choice.Attack;
         // TODO: Call BattleSystem.Attack() or notify BattleManager
     }
@@ -153,7 +153,7 @@ public class BattleFieldMenu : MonoBehaviour
     /// </summary>
     public void OnGrabClicked()
     {
-        Debug.Log("BattleFieldMenu: GRAB button clicked! Grab beats Block.");
+        DebugTag.Log(nameof(BattleFieldMenu), "GRAB button clicked! Grab beats Block.");
         _playerChoice = Choice.Grab;
         // TODO: Call BattleSystem.Grab() or notify BattleManager
     }
@@ -164,7 +164,7 @@ public class BattleFieldMenu : MonoBehaviour
     /// </summary>
     public void OnBlockClicked()
     {
-        Debug.Log("BattleFieldMenu: BLOCK button clicked! Block beats Attack.");
+        DebugTag.Log(nameof(BattleFieldMenu), "BLOCK button clicked! Block beats Attack.");
         _playerChoice = Choice.Block;
         // TODO: Call BattleSystem.Block() or notify BattleManager
     }

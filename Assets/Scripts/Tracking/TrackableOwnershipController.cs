@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using TMPro;
 
 /// <summary>
 /// NetworkBehaviour component that allows clients to request ownership of a trackable NetworkObject
@@ -12,15 +13,14 @@ using UnityEngine.Events;
 [RequireComponent(typeof(NetworkObject))]
 public class TrackableOwnershipController : NetworkBehaviour
 {
-    [Header("Events")]
-    [Tooltip("Invoked when ownership is successfully transferred to a client.")]
     public UnityEvent<ulong> onOwnershipTransferred;
-
-    [Tooltip("Invoked when ownership transfer is denied (e.g., already owned by another client).")]
     public UnityEvent<ulong> onOwnershipDenied;
-
-    [Tooltip("Invoked when ownership is released back to the server.")]
     public UnityEvent onOwnershipReleased;
+
+    [Header("Status Display")]
+    [Tooltip("Optional: Text component to display ownership status. If assigned, will be automatically updated.")]
+    [SerializeField]
+    private TMP_Text statusText;
 
     // Network variable to track current owner (for UI display purposes)
     private NetworkVariable<ulong> _currentOwnerId = new NetworkVariable<ulong>(
@@ -35,6 +35,9 @@ public class TrackableOwnershipController : NetworkBehaviour
     // Track previous owner ID to detect ownership changes
     private ulong _previousOwnerId = NetworkManager.ServerClientId;
 
+    // Track last update time for tick-based updates
+    private float _lastStatusUpdateTime;
+
     #region Unity Lifecycle
 
     private void Awake()
@@ -43,7 +46,7 @@ public class TrackableOwnershipController : NetworkBehaviour
         
         if (_networkObject == null)
         {
-            Debug.LogError($"[TrackableOwnershipController] NetworkObject component not found on {gameObject.name}. " +
+            DebugTag.LogError(nameof(TrackableOwnershipController), $"NetworkObject component not found on {gameObject.name}. " +
                           "This component requires a NetworkObject to function.");
             enabled = false;
             return;
@@ -71,7 +74,10 @@ public class TrackableOwnershipController : NetworkBehaviour
         // Subscribe to network variable changes for UI updates
         _currentOwnerId.OnValueChanged += OnOwnerIdChanged;
 
-        Debug.Log($"[TrackableOwnershipController] NetworkObject spawned. Initial owner: {_networkObject.OwnerClientId}");
+        // Initial status update
+        UpdateStatusText();
+
+        DebugTag.Log(nameof(TrackableOwnershipController), $"NetworkObject spawned. Initial owner: {_networkObject.OwnerClientId}");
     }
 
     public override void OnNetworkDespawn()
@@ -112,6 +118,24 @@ public class TrackableOwnershipController : NetworkBehaviour
         _previousOwnerId = newOwnerId;
     }
 
+    private void Update()
+    {
+        // Update status text based on network tick rate
+        if (statusText != null && NetworkManager.Singleton != null)
+        {
+            uint tickRate = NetworkManager.Singleton.NetworkConfig.TickRate;
+            if (tickRate > 0)
+            {
+                float tickInterval = 1f / tickRate;
+                if (Time.time - _lastStatusUpdateTime >= tickInterval)
+                {
+                    UpdateStatusText();
+                    _lastStatusUpdateTime = Time.time;
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region Public API (Callable from UI)
@@ -124,13 +148,13 @@ public class TrackableOwnershipController : NetworkBehaviour
     {
         if (!IsSpawned)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot request ownership: NetworkObject is not spawned.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), "Cannot request ownership: NetworkObject is not spawned.");
             return;
         }
 
         if (!IsClient)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot request ownership: Not a client.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), "Cannot request ownership: Not a client.");
             return;
         }
 
@@ -139,7 +163,7 @@ public class TrackableOwnershipController : NetworkBehaviour
         // Check if already owner
         if (_networkObject.OwnerClientId == localClientId)
         {
-            Debug.Log($"[TrackableOwnershipController] Client {localClientId} already owns this trackable.");
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Client {localClientId} already owns this trackable.");
             return;
         }
 
@@ -154,13 +178,13 @@ public class TrackableOwnershipController : NetworkBehaviour
     {
         if (!IsSpawned)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot release ownership: NetworkObject is not spawned.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), "Cannot release ownership: NetworkObject is not spawned.");
             return;
         }
 
         if (!IsOwner)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot release ownership: Not the current owner.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), "Cannot release ownership: Not the current owner.");
             return;
         }
 
@@ -204,20 +228,20 @@ public class TrackableOwnershipController : NetworkBehaviour
     {
         if (!IsSpawned)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot perform {actionName}: NetworkObject is not spawned.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), $"Cannot perform {actionName}: NetworkObject is not spawned.");
             return false;
         }
 
         if (!IsClient)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot perform {actionName}: Not a client.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), $"Cannot perform {actionName}: Not a client.");
             return false;
         }
 
         if (!IsLocalClientOwner())
         {
             ulong currentOwnerId = GetCurrentOwnerId();
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot perform {actionName}: " +
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), $"Cannot perform {actionName}: " +
                           $"Local client is not the owner. Current owner: {currentOwnerId}");
             return false;
         }
@@ -239,6 +263,38 @@ public class TrackableOwnershipController : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Gets a formatted status string describing the current ownership state.
+    /// Use this to display ownership status in UI elements.
+    /// </summary>
+    /// <returns>Status string describing the current ownership state</returns>
+    public string GetStatusText()
+    {
+        if (!IsSpawned)
+        {
+            return "Status: Not Spawned";
+        }
+
+        ulong ownerId = GetCurrentOwnerId();
+        bool isLocalOwner = IsLocalClientOwner();
+
+        if (isLocalOwner)
+        {
+            return "Status: You Own This";
+        }
+        
+        // Treat the server as a regular client from the perspective of other users.
+        // If the server owns the object, non-server clients should see it as owned,
+        // not "available".
+        if (ownerId == NetworkManager.ServerClientId)
+        {
+            // Host / server itself will already have hit the "You Own This" branch above.
+            return "Status: Owned by Host";
+        }
+
+        return $"Status: Owned by Client {ownerId}";
+    }
+
     #endregion
 
     #region Server RPCs
@@ -253,14 +309,14 @@ public class TrackableOwnershipController : NetworkBehaviour
 
         if (!IsSpawned)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot transfer ownership: NetworkObject is not spawned.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), "Cannot transfer ownership: NetworkObject is not spawned.");
             return;
         }
 
         // Validate that the requesting client exists
         if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(requestingClientId))
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot transfer ownership: Client {requestingClientId} is not connected.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), $"Cannot transfer ownership: Client {requestingClientId} is not connected.");
             DenyOwnershipClientRpc(requestingClientId);
             return;
         }
@@ -270,14 +326,14 @@ public class TrackableOwnershipController : NetworkBehaviour
         // Check if already owned by requesting client
         if (currentOwnerId == requestingClientId)
         {
-            Debug.Log($"[TrackableOwnershipController] Client {requestingClientId} already owns this trackable.");
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Client {requestingClientId} already owns this trackable.");
             return;
         }
 
         // Check exclusive ownership (always enforced)
         if (currentOwnerId != NetworkManager.ServerClientId)
         {
-            Debug.Log($"[TrackableOwnershipController] Ownership denied: Trackable is already owned by client {currentOwnerId}. " +
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Ownership denied: Trackable is already owned by client {currentOwnerId}. " +
                      $"Requesting client: {requestingClientId}");
             DenyOwnershipClientRpc(requestingClientId);
             return;
@@ -290,14 +346,14 @@ public class TrackableOwnershipController : NetworkBehaviour
         if (_networkObject.OwnerClientId == requestingClientId)
         {
             _currentOwnerId.Value = requestingClientId;
-            Debug.Log($"[TrackableOwnershipController] Ownership transferred from client {currentOwnerId} to client {requestingClientId}.");
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Ownership transferred from client {currentOwnerId} to client {requestingClientId}.");
             
             // Notify all clients of successful transfer
             OnOwnershipTransferredClientRpc(requestingClientId);
         }
         else
         {
-            Debug.LogError($"[TrackableOwnershipController] Failed to transfer ownership to client {requestingClientId}. " +
+            DebugTag.LogError(nameof(TrackableOwnershipController), $"Failed to transfer ownership to client {requestingClientId}. " +
                           $"Current owner is still {_networkObject.OwnerClientId}.");
             DenyOwnershipClientRpc(requestingClientId);
         }
@@ -315,7 +371,7 @@ public class TrackableOwnershipController : NetworkBehaviour
         // Verify that the caller is the current owner
         if (currentOwnerId != releasingClientId)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Client {releasingClientId} attempted to release ownership, " +
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), $"Client {releasingClientId} attempted to release ownership, " +
                            $"but current owner is {currentOwnerId}.");
             return;
         }
@@ -327,7 +383,7 @@ public class TrackableOwnershipController : NetworkBehaviour
         if (_networkObject.OwnerClientId == NetworkManager.ServerClientId)
         {
             _currentOwnerId.Value = NetworkManager.ServerClientId;
-            Debug.Log($"[TrackableOwnershipController] Ownership released by client {releasingClientId}. " +
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Ownership released by client {releasingClientId}. " +
                      "Trackable is now owned by the server.");
             
             // Notify all clients
@@ -335,7 +391,7 @@ public class TrackableOwnershipController : NetworkBehaviour
         }
         else
         {
-            Debug.LogError($"[TrackableOwnershipController] Failed to release ownership from client {releasingClientId}. " +
+            DebugTag.LogError(nameof(TrackableOwnershipController), $"Failed to release ownership from client {releasingClientId}. " +
                           $"Current owner is still {_networkObject.OwnerClientId}.");
         }
     }
@@ -351,11 +407,12 @@ public class TrackableOwnershipController : NetworkBehaviour
     private void OnOwnershipTransferredClientRpc(ulong newOwnerId)
     {
         onOwnershipTransferred?.Invoke(newOwnerId);
+        UpdateStatusText();
 
         // Log for the new owner
         if (IsClient && NetworkManager.Singleton.LocalClientId == newOwnerId)
         {
-            Debug.Log($"[TrackableOwnershipController] You are now the owner of trackable: {gameObject.name}");
+            DebugTag.Log(nameof(TrackableOwnershipController), $"You are now the owner of trackable: {gameObject.name}");
         }
     }
 
@@ -369,7 +426,8 @@ public class TrackableOwnershipController : NetworkBehaviour
         if (IsClient && NetworkManager.Singleton.LocalClientId == deniedClientId)
         {
             onOwnershipDenied?.Invoke(deniedClientId);
-            Debug.Log($"[TrackableOwnershipController] Ownership request denied for trackable: {gameObject.name}");
+            UpdateStatusText();
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Ownership request denied for trackable: {gameObject.name}");
         }
     }
 
@@ -380,7 +438,8 @@ public class TrackableOwnershipController : NetworkBehaviour
     private void OnOwnershipReleasedClientRpc()
     {
         onOwnershipReleased?.Invoke();
-        Debug.Log($"[TrackableOwnershipController] Ownership released for trackable: {gameObject.name}");
+        UpdateStatusText();
+        DebugTag.Log(nameof(TrackableOwnershipController), $"Ownership released for trackable: {gameObject.name}");
     }
 
     #endregion
@@ -397,7 +456,7 @@ public class TrackableOwnershipController : NetworkBehaviour
             _currentOwnerId.Value = newOwnerId;
         }
 
-        Debug.Log($"[TrackableOwnershipController] Ownership changed from client {previousOwnerId} to client {newOwnerId} " +
+        DebugTag.Log(nameof(TrackableOwnershipController), $"Ownership changed from client {previousOwnerId} to client {newOwnerId} " +
                  $"on {gameObject.name}");
     }
 
@@ -416,7 +475,7 @@ public class TrackableOwnershipController : NetworkBehaviour
         // If the disconnected client was the owner, automatically reclaim ownership
         if (currentOwnerId == disconnectedClientId)
         {
-            Debug.Log($"[TrackableOwnershipController] Owner (client {disconnectedClientId}) disconnected. " +
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Owner (client {disconnectedClientId}) disconnected. " +
                      "Automatically reclaiming ownership to server.");
 
             // ChangeOwnership returns void, so we verify after the call
@@ -430,7 +489,7 @@ public class TrackableOwnershipController : NetworkBehaviour
             }
             else
             {
-                Debug.LogError($"[TrackableOwnershipController] Failed to reclaim ownership from disconnected client {disconnectedClientId}. " +
+                DebugTag.LogError(nameof(TrackableOwnershipController), $"Failed to reclaim ownership from disconnected client {disconnectedClientId}. " +
                               $"Current owner is still {_networkObject.OwnerClientId}.");
             }
         }
@@ -441,8 +500,20 @@ public class TrackableOwnershipController : NetworkBehaviour
     /// </summary>
     private void OnOwnerIdChanged(ulong previousOwnerId, ulong newOwnerId)
     {
-        // This can be used to update UI elements that display the current owner
-        // For example, showing "Owned by Player X" or "Available"
+        UpdateStatusText();
+    }
+
+    /// <summary>
+    /// Updates the status text UI element if assigned.
+    /// </summary>
+    private void UpdateStatusText()
+    {
+        if (statusText == null)
+        {
+            return;
+        }
+
+        statusText.text = GetStatusText();
     }
 
     #endregion
@@ -456,13 +527,13 @@ public class TrackableOwnershipController : NetworkBehaviour
     {
         if (!IsServer)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] ForceOwnershipTransfer can only be called on the server.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), "ForceOwnershipTransfer can only be called on the server.");
             return;
         }
 
         if (!IsSpawned)
         {
-            Debug.LogWarning($"[TrackableOwnershipController] Cannot force ownership transfer: NetworkObject is not spawned.");
+            DebugTag.LogWarning(nameof(TrackableOwnershipController), "Cannot force ownership transfer: NetworkObject is not spawned.");
             return;
         }
 
@@ -470,7 +541,7 @@ public class TrackableOwnershipController : NetworkBehaviour
 
         if (currentOwnerId == newOwnerId)
         {
-            Debug.Log($"[TrackableOwnershipController] Client {newOwnerId} already owns this trackable.");
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Client {newOwnerId} already owns this trackable.");
             return;
         }
 
@@ -481,12 +552,12 @@ public class TrackableOwnershipController : NetworkBehaviour
         if (_networkObject.OwnerClientId == newOwnerId)
         {
             _currentOwnerId.Value = newOwnerId;
-            Debug.Log($"[TrackableOwnershipController] Server forced ownership transfer from client {currentOwnerId} to client {newOwnerId}.");
+            DebugTag.Log(nameof(TrackableOwnershipController), $"Server forced ownership transfer from client {currentOwnerId} to client {newOwnerId}.");
             OnOwnershipTransferredClientRpc(newOwnerId);
         }
         else
         {
-            Debug.LogError($"[TrackableOwnershipController] Failed to force ownership transfer to client {newOwnerId}. " +
+            DebugTag.LogError(nameof(TrackableOwnershipController), $"Failed to force ownership transfer to client {newOwnerId}. " +
                           $"Current owner is still {_networkObject.OwnerClientId}.");
         }
     }

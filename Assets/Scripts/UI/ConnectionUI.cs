@@ -31,7 +31,7 @@ public class ConnectionUI : MonoBehaviour
 
         if (statusText == null)
         {
-            Debug.LogWarning("[ConnectionUI] No Text component found. Please assign statusText in the Inspector.");
+            DebugTag.LogWarning(nameof(ConnectionUI), "No Text component found. Please assign statusText in the Inspector.");
             enabled = false;
             return;
         }
@@ -106,13 +106,13 @@ public class ConnectionUI : MonoBehaviour
                             // Log available fields for debugging (only in editor to avoid spam)
                             #if UNITY_EDITOR
                             var allFields = settingsType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                            Debug.LogWarning($"[ConnectionUI] Could not find ovrAppID field. Type: {settingsType.Name}. Available fields: {string.Join(", ", System.Array.ConvertAll(allFields, f => f.Name))}");
+                            DebugTag.LogWarning(nameof(ConnectionUI), $"Could not find ovrAppID field. Type: {settingsType.Name}. Available fields: {string.Join(", ", System.Array.ConvertAll(allFields, f => f.Name))}");
                             #endif
                             
                             // Fallback: Try to read from known value in this project
                             // This is a fallback - you can set this manually if reflection fails
                             cachedOculusAppID = "31777681461876531"; // Fallback value from OculusPlatformSettings.asset
-                            Debug.Log($"[ConnectionUI] Using fallback Oculus App ID: {cachedOculusAppID}");
+                            DebugTag.Log(nameof(ConnectionUI), $"Using fallback Oculus App ID: {cachedOculusAppID}");
                         }
                     }
                 }
@@ -125,7 +125,7 @@ public class ConnectionUI : MonoBehaviour
         catch (System.Exception ex)
         {
             cachedOculusAppID = $"Error: {ex.Message}";
-            Debug.LogWarning($"[ConnectionUI] Could not load Oculus App ID: {ex.Message}\nStackTrace: {ex.StackTrace}");
+            DebugTag.LogWarning(nameof(ConnectionUI), $"Could not load Oculus App ID: {ex.Message}\nStackTrace: {ex.StackTrace}");
         }
     }
 
@@ -133,33 +133,33 @@ public class ConnectionUI : MonoBehaviour
     {
         if (hasLoggedConnectionInfo) return;
         
-        Debug.Log("=== [ConnectionUI] Connection Parameters ===");
-        Debug.Log($"[ConnectionUI] Application Version: {cachedAppVersion}");
-        Debug.Log($"[ConnectionUI] Build GUID: {cachedBuildGUID}");
-        Debug.Log($"[ConnectionUI] Oculus App ID: {cachedOculusAppID}");
-        Debug.Log($"[ConnectionUI] Protocol Version: {cachedProtocolVersion}");
+        DebugTag.Log(nameof(ConnectionUI), "=== Connection Parameters ===");
+        DebugTag.Log(nameof(ConnectionUI), $"Application Version: {cachedAppVersion}");
+        DebugTag.Log(nameof(ConnectionUI), $"Build GUID: {cachedBuildGUID}");
+        DebugTag.Log(nameof(ConnectionUI), $"Oculus App ID: {cachedOculusAppID}");
+        DebugTag.Log(nameof(ConnectionUI), $"Protocol Version: {cachedProtocolVersion}");
         
         if (NetworkManager.Singleton != null && NetworkManager.Singleton.NetworkConfig != null)
         {
             var config = NetworkManager.Singleton.NetworkConfig;
-            Debug.Log($"[ConnectionUI] NetworkConfig ProtocolVersion: {config.ProtocolVersion}");
-            Debug.Log($"[ConnectionUI] ForceSamePrefabs: {config.ForceSamePrefabs}");
+            DebugTag.Log(nameof(ConnectionUI), $"NetworkConfig ProtocolVersion: {config.ProtocolVersion}");
+            DebugTag.Log(nameof(ConnectionUI), $"ForceSamePrefabs: {config.ForceSamePrefabs}");
             
             // Warning about protocol version
             if (config.ProtocolVersion == 0)
             {
-                Debug.LogWarning("[ConnectionUI] WARNING: Protocol Version is 0. Different builds may not be able to connect. " +
+                DebugTag.LogWarning(nameof(ConnectionUI), "WARNING: Protocol Version is 0. Different builds may not be able to connect. " +
                     "Consider incrementing ProtocolVersion when making breaking network changes.");
             }
             
             // Warning about ForceSamePrefabs
             if (!config.ForceSamePrefabs)
             {
-                Debug.LogWarning("[ConnectionUI] WARNING: ForceSamePrefabs is disabled. Clients with different prefab versions may cause connection issues.");
+                DebugTag.LogWarning(nameof(ConnectionUI), "WARNING: ForceSamePrefabs is disabled. Clients with different prefab versions may cause connection issues.");
             }
         }
         
-        Debug.Log("=== [ConnectionUI] End Connection Parameters ===");
+        DebugTag.Log(nameof(ConnectionUI), "=== End Connection Parameters ===");
         hasLoggedConnectionInfo = true;
     }
 
@@ -177,7 +177,7 @@ public class ConnectionUI : MonoBehaviour
             waitingTimer += Time.deltaTime;
             if (waitingTimer > 5f && !hasShownWaitingMessage)
             {
-                Debug.Log("[ConnectionUI] Waiting for matchmaking to connect... Check that Auto Matchmaking is properly configured.");
+                DebugTag.Log(nameof(ConnectionUI), "Waiting for matchmaking to connect... Check that Auto Matchmaking is properly configured.");
                 hasShownWaitingMessage = true;
             }
         }
@@ -304,7 +304,7 @@ public class ConnectionUI : MonoBehaviour
         }
         catch (System.Exception ex)
         {
-            Debug.LogWarning($"[ConnectionUI] Could not read transport connection data: {ex.Message}");
+            DebugTag.LogWarning(nameof(ConnectionUI), $"Could not read transport connection data: {ex.Message}");
         }
 
         return $"Transport: {transportType}{connectionInfo}";

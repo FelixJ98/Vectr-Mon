@@ -2532,18 +2532,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11ef6fa5d790a04448172aff301a3459, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrackableManager
-  trackablePrefab: {fileID: 8831873341510933367, guid: e168e7e619e46a140ad1ede16fac1756,
+  trackablePrefab: {fileID: 6100525759923228312, guid: 16921068991ae424ba67ead18c9070e7,
     type: 3}
-  onTrackableAdded:
-    m_PersistentCalls:
-      m_Calls: []
-  onTrackableRemoved:
-    m_PersistentCalls:
-      m_Calls: []
-  onPositionUpdated:
-    m_PersistentCalls:
-      m_Calls: []
-  positionUpdateInterval: 0.1
   positionUpdateThreshold: 0.01
 --- !u!1 &1119048030
 GameObject:
@@ -3271,7 +3261,7 @@ MonoBehaviour:
   GlobalObjectIdHash: 1486093600
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1

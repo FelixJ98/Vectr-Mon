@@ -11,12 +11,12 @@ public class TableTouchZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"[TableTouch] {other.name} touched table anchor... tag={other.tag}", this);
+        DebugTag.Log(nameof(TableTouchZone), $"{other.name} touched table anchor... tag={other.tag}");
 
         //if (!IsValidTouch(other))
         //    return;
 
-        Debug.Log($"[TableTouch] {other.name} confirmed touch — spawning cube.", this);
+        DebugTag.Log(nameof(TableTouchZone), $"{other.name} confirmed touch — spawning cube.");
 
         var thisCol = GetComponent<Collider>();
         Vector3 direction;
@@ -29,7 +29,7 @@ public class TableTouchZone : MonoBehaviour
         {
             Vector3 contactPoint = other.transform.position + direction * distance;
             SpawnCubeAtPoint(contactPoint);
-            Debug.Log($"Contact point: {contactPoint}");
+            DebugTag.Log(nameof(TableTouchZone), $"Contact point: {contactPoint}");
         }
     }
 

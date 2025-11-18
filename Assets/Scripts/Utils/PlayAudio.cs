@@ -17,7 +17,7 @@ public class PlayAudio : MonoBehaviour
         // Check if AudioSource exists
         if (audioSource == null)
         {
-            Debug.LogWarning("No AudioSource found on " + gameObject.name);
+            DebugTag.LogWarning(nameof(PlayAudio), $"No AudioSource found on {gameObject.name}");
             return;
         }
 
@@ -40,11 +40,11 @@ public class PlayAudio : MonoBehaviour
         if (audioSource != null && audioSource.clip != null)
         {
             audioSource.Play();
-            Debug.Log($"Playing audio: {audioSource.clip.name}");
+            DebugTag.Log(nameof(PlayAudio), $"Playing audio: {audioSource.clip.name}");
         }
         else
         {
-            Debug.LogWarning("AudioSource or AudioClip is missing!");
+            DebugTag.LogWarning(nameof(PlayAudio), "AudioSource or AudioClip is missing!");
         }
     }
 
