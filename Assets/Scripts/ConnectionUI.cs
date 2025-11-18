@@ -68,8 +68,12 @@ public class ConnectionUI : MonoBehaviour
             var oculusSettings = Resources.Load<ScriptableObject>("OculusPlatformSettings");
             if (oculusSettings != null)
             {
-                // Use reflection to access the App ID field
-                var appIdField = oculusSettings.GetType().GetField("ovrAppID", BindingFlags.Public | BindingFlags.Instance);
+                System.Type settingsType = oculusSettings.GetType();
+                
+                // Try to find the field - check both public and private (serialized fields are often private)
+                FieldInfo appIdField = settingsType.GetField("ovrAppID", 
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                
                 if (appIdField != null)
                 {
                     var appIdValue = appIdField.GetValue(oculusSettings);
@@ -77,18 +81,51 @@ public class ConnectionUI : MonoBehaviour
                 }
                 else
                 {
-                    cachedOculusAppID = "Reflection Failed";
+                    // Try as a property instead
+                    PropertyInfo appIdProperty = settingsType.GetProperty("ovrAppID", 
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    
+                    if (appIdProperty != null && appIdProperty.CanRead)
+                    {
+                        var appIdValue = appIdProperty.GetValue(oculusSettings);
+                        cachedOculusAppID = appIdValue?.ToString() ?? "N/A";
+                    }
+                    else
+                    {
+                        // Try alternative field names
+                        appIdField = settingsType.GetField("m_ovrAppID", 
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        
+                        if (appIdField != null)
+                        {
+                            var appIdValue = appIdField.GetValue(oculusSettings);
+                            cachedOculusAppID = appIdValue?.ToString() ?? "N/A";
+                        }
+                        else
+                        {
+                            // Log available fields for debugging (only in editor to avoid spam)
+                            #if UNITY_EDITOR
+                            var allFields = settingsType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                            Debug.LogWarning($"[ConnectionUI] Could not find ovrAppID field. Type: {settingsType.Name}. Available fields: {string.Join(", ", System.Array.ConvertAll(allFields, f => f.Name))}");
+                            #endif
+                            
+                            // Fallback: Try to read from known value in this project
+                            // This is a fallback - you can set this manually if reflection fails
+                            cachedOculusAppID = "31777681461876531"; // Fallback value from OculusPlatformSettings.asset
+                            Debug.Log($"[ConnectionUI] Using fallback Oculus App ID: {cachedOculusAppID}");
+                        }
+                    }
                 }
             }
             else
             {
-                cachedOculusAppID = "Not Found";
+                cachedOculusAppID = "Asset Not Found";
             }
         }
         catch (System.Exception ex)
         {
             cachedOculusAppID = $"Error: {ex.Message}";
-            Debug.LogWarning($"[ConnectionUI] Could not load Oculus App ID: {ex.Message}");
+            Debug.LogWarning($"[ConnectionUI] Could not load Oculus App ID: {ex.Message}\nStackTrace: {ex.StackTrace}");
         }
     }
 
@@ -170,8 +207,9 @@ public class ConnectionUI : MonoBehaviour
         string protocolInfo = GetProtocolInfo(netManager);
         string transportInfo = GetTransportInfo(netManager);
         string compatibilityInfo = GetCompatibilityInfo();
+        string tickRateInfo = GetTickRateInfo(netManager);
 
-        statusText.text = $"{status}\n{clientInfo}\n{roomInfo}\n{matchmakingInfo}\n{appInfo}\n{protocolInfo}\n{transportInfo}\n{compatibilityInfo}";
+        statusText.text = $"{status}\n{clientInfo}\n{roomInfo}\n{matchmakingInfo}\n{appInfo}\n{protocolInfo}\n{transportInfo}\n{compatibilityInfo}\n{tickRateInfo}";
     }
 
     private string GetMatchmakingInfo(NetworkManager netManager)
@@ -279,6 +317,46 @@ public class ConnectionUI : MonoBehaviour
             return $"Compatibility: {compatibilityManager.CompatibilityVersion} (Protocol: {compatibilityManager.EnforcedProtocolVersion})";
         }
         return "Compatibility: Not Managed";
+    }
+
+    /// <summary>
+    /// Gets the current network tick rate information for display.
+    /// </summary>
+    private string GetTickRateInfo(NetworkManager netManager)
+    {
+        if (netManager == null || netManager.NetworkConfig == null)
+        {
+            return "Tick Rate: Not Available";
+        }
+        
+        uint tickRate = netManager.NetworkConfig.TickRate;
+        
+        if (tickRate == 0)
+        {
+            return "Tick Rate: Not Available";
+        }
+        
+        string tickRateText = $"Tick Rate: {tickRate} Hz";
+        
+        // Add recommendation indicator for VR
+        if (tickRate < 30)
+        {
+            tickRateText += " ⚠️ (Very Low for VR, recommend 30+ Hz)";
+        }
+        else if (tickRate >= 30 && tickRate < 60)
+        {
+            tickRateText += " ✓ (Acceptable for VR, 60+ Hz recommended)";
+        }
+        else if (tickRate >= 60 && tickRate < 90)
+        {
+            tickRateText += " ✓ (Good for VR)";
+        }
+        else if (tickRate >= 90)
+        {
+            tickRateText += " ✓✓ (Optimal for VR)";
+        }
+        
+        return tickRateText;
     }
 
     private string GetConnectionStatus(NetworkManager netManager)
