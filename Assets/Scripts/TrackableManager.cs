@@ -1,55 +1,30 @@
 using Meta.XR.MRUtilityKit;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public class TrackableManager : MonoBehaviour
+public class TrackableManager : NetworkBehaviour
 {
     [SerializeField] private GameObject trackedObjectPrefab;
-    [SerializeField] Dictionary<string, GameObject[]> trackedObjects = new Dictionary<string, GameObject[]>();
     NetworkList<FixedString512Bytes> keys = new NetworkList<FixedString512Bytes>();
-    public GameObject spo; //SpawnedTrackedObject
+    //public TextMeshProUGUI log;
+
+    // Local reference for the client who spawned the object
+    public GameObject spo;
     private MRUKTrackable trackable;
-    //private bool onceOnly = false;
+
     private void Update()
     {
-        UpdateObjectLocationServerRpc();
+        if (spo != null && trackable != null)
+        {
+            // Update server with the position of this client's object
+            //log.text = "IT RAN UPDATE";
+            UpdateObjectLocationServerRpc(spo.GetComponent<NetworkObject>().NetworkObjectId, trackable.transform.position);
+        }
     }
-
-
-    // Called by MR Utility Kit's TrackableAdded event
-    /*public void OnTrackableAdded(MRUKTrackable trackable)
-    {
-        if (trackable == null)
-        {
-            Debug.LogWarning("[TrackableManager] OnTrackableAdded called with null trackable!");
-            return;
-        }
-        this.trackable = trackable;
-        Debug.Log($"[TrackableManager] Added trackable of type: {trackable.TrackableType}, GameObject: {trackable.gameObject.name}");
-
-        if (trackable.TrackableType == OVRAnchor.TrackableType.QRCode)
-        {
-            string payload = trackable.MarkerPayloadString;
-            Debug.Log($"[TrackableManager] Detected QR code payload: {payload}");
-
-            if (trackedObjectPrefab != null)
-            {
-                if (!onceOnly && trackedObjectPrefab != null)
-                {
-                    StartCoroutine(SpawnCubeRoutine());
-                }
-                //GameObject instance = Instantiate(trackedObjectPrefab, trackable.transform);
-                Debug.Log($"[TrackableManager] Spawned prefab '{trackedObjectPrefab.name}' under QR code '{trackable.name}'.");
-            }
-            else
-            {
-                Debug.LogWarning("[TrackableManager] trackedObjectPrefab is not assigned.");
-            }
-        }
-    }*/
 
     public void OnTrackableAdded(MRUKTrackable trackable)
     {
@@ -68,10 +43,8 @@ public class TrackableManager : MonoBehaviour
 
             if (!keys.Contains(payload))
             {
-                GameObject spawned = SpawnAndReturnServerRpc(trackable.transform.position, trackable.transform.rotation);
-                GameObject[] spawnedObjects = { spawned, trackable.gameObject};
-                trackedObjects.Add(payload, spawnedObjects);
-                keys.Add(payload);
+                RequestAddKeyServerRpc(payload);
+                SpawnAndReturnServerRpc(trackable.transform.position, trackable.transform.rotation);
                 Debug.Log($"[TrackableManager] Spawned prefab '{trackedObjectPrefab.name}' under QR code '{trackable.name}'.");
             }
             else
@@ -81,7 +54,6 @@ public class TrackableManager : MonoBehaviour
         }
     }
 
-    // Called by MR Utility Kit's TrackableRemoved event
     public void OnTrackableRemoved(MRUKTrackable trackable)
     {
         if (trackable == null)
@@ -94,139 +66,47 @@ public class TrackableManager : MonoBehaviour
         Destroy(trackable.gameObject);
     }
 
-    /*private IEnumerator SpawnCubeRoutine()
-    {
-        onceOnly = true;
-
-        // Ask the host to spawn the cube
-        RequestSpawnServerRpc(trackable.transform.position, trackable.transform.rotation);
-
-        yield return new WaitForSeconds(1f);
-        onceOnly = false;
-    }
-
     [ServerRpc(RequireOwnership = false)]
-    void RequestSpawnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
+    void SpawnAndReturnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
-        //GameObject instance = Instantiate(trackedObjectPrefab, position, rotation);
-        spo = Instantiate(trackedObjectPrefab, position, rotation);
-        //instance.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
-        spo.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
-    }*/
-
-    [ServerRpc(RequireOwnership = false)]
-    GameObject SpawnAndReturnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
-    {
-        //GameObject instance = Instantiate(trackedObjectPrefab, position, rotation);
-        spo = Instantiate(trackedObjectPrefab, position, rotation);
-        //instance.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
-        spo.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId);
-
-        return spo;
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    void UpdateObjectLocationServerRpc(ServerRpcParams rpcParams = default)
-    {
-        if (trackedObjects.Count != 0)
-        {
-            foreach(GameObject[] g in trackedObjects.Values)
-            {
-                g[0].GetComponent<NetworkObject>().transform.position = g[1].transform.position;
-            }
-        }
-    }
-}
-
-
-
-
-
-
-// Method does not work
-/*
-public class TrackableManager : NetworkBehaviour
-{
-    [SerializeField] private GameObject trackedObjectPrefab;
-    private bool onceOnly = false;
-
-    public void OnTrackableAdded(MRUKTrackable trackable)
-    {
-        if (trackable == null)
-        {
-            Debug.LogWarning("[TrackableManager] OnTrackableAdded called with null trackable!");
-            return;
-        }
-
-        Debug.Log($"[TrackableManager] Added trackable of type: {trackable.TrackableType}, GameObject: {trackable.gameObject.name}");
-
-        if (trackable.TrackableType == OVRAnchor.TrackableType.QRCode)
-        {
-            string payload = trackable.MarkerPayloadString;
-            Debug.Log($"[TrackableManager] Detected QR code payload: {payload}");
-
-            if (trackedObjectPrefab != null && !onceOnly)
-            {
-                StartCoroutine(SpawnAndAttachRoutine(trackable));
-            }
-        }
-    }
-
-    public void OnTrackableRemoved(MRUKTrackable trackable)
-    {
-        if (trackable == null) return;
-        Debug.Log($"[TrackableManager] Removed trackable of type: {trackable.TrackableType}, GameObject: {trackable.gameObject.name}");
-        Destroy(trackable.gameObject);
-    }
-
-    private IEnumerator SpawnAndAttachRoutine(MRUKTrackable trackable)
-    {
-        onceOnly = true;
-        Vector3 pos = trackable.transform.position;
-        Quaternion rot = trackable.transform.rotation;
-
-        // Host/server spawns the object
-        RequestSpawnServerRpc(pos, rot, trackable.GetInstanceID());
-        yield return new WaitForSeconds(1f);
-        onceOnly = false;
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void RequestSpawnServerRpc(Vector3 position, Quaternion rotation, int trackableInstanceId, ServerRpcParams rpcParams = default)
-    {
-        GameObject instance = Instantiate(trackedObjectPrefab, position, rotation);
-        NetworkObject netObj = instance.GetComponent<NetworkObject>();
+        // Spawn the object on the server
+        var netObj = Instantiate(trackedObjectPrefab, position, rotation).GetComponent<NetworkObject>();
+        //log = netObj.GetComponentInChildren<TextMeshProUGUI>();
+        //log.text = "I BELONG TO " + rpcParams.Receive.SenderClientId;
         netObj.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
 
-        // Tell all clients to parent this spawned object to their local trackable
-        AttachToTrackableClientRpc(netObj.NetworkObjectId, trackableInstanceId);
+        // Tell only the requesting client to assign their local 'spo'
+        AssignLocalSpoClientRpc(netObj.NetworkObjectId, new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId } }
+        });
     }
 
     [ClientRpc]
-    private void AttachToTrackableClientRpc(ulong spawnedObjectId, int trackableInstanceId)
+    void AssignLocalSpoClientRpc(ulong networkObjectId, ClientRpcParams clientRpcParams = default)
     {
-        var allTrackables = FindObjectsOfType<MRUKTrackable>();
-        MRUKTrackable target = null;
-        foreach (var t in allTrackables)
+        // Runs only on the client who requested the spawn
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out var netObj))
         {
-            if (t.GetInstanceID() == trackableInstanceId)
-            {
-                target = t;
-                break;
-            }
+            spo = netObj.gameObject; // assign local reference
         }
+    }
 
-        if (target == null)
+    [ServerRpc(RequireOwnership = false)]
+    void UpdateObjectLocationServerRpc(ulong networkObjectId, Vector3 position)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out var netObj))
         {
-            Debug.LogWarning($"[TrackableManager] Could not find local trackable with id {trackableInstanceId}");
-            return;
+            netObj.transform.position = position; // update the correct object
         }
+    }
 
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(spawnedObjectId, out var netObj))
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestAddKeyServerRpc(FixedString512Bytes key, ServerRpcParams rpcParams = default)
+    {
+        if (!keys.Contains(key))
         {
-            netObj.transform.SetParent(target.transform, worldPositionStays: true);
-            Debug.Log($"[TrackableManager] Attached spawned prefab '{netObj.name}' to QR '{target.name}' locally.");
+            keys.Add(key);
         }
     }
 }
-*/
