@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5305775764221223643}
-  - component: {fileID: 4855744890609012807}
   - component: {fileID: -7879346474164322376}
   - component: {fileID: 7489672731616463714}
+  - component: {fileID: 4855744890609012807}
   - component: {fileID: 2485922263980161428}
   m_Layer: 0
   m_Name: Pikam
@@ -37,21 +37,6 @@ Transform:
   - {fileID: 7506839187304838848}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 180, y: 0, z: 180}
---- !u!114 &4855744890609012807
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5304135656924426891}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f2bf26f0e0b6c046aeffb48b039cdeb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayAudio
-  audioSource: {fileID: 0}
-  playOnAwake: 1
-  delayBeforePlay: 0
 --- !u!54 &-7879346474164322376
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -100,6 +85,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.8577816, y: 3.9029107, z: 4.5851903}
   m_Center: {x: -0.07111208, y: 0.5921599, z: 1.672481}
+--- !u!114 &4855744890609012807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5304135656924426891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f2bf26f0e0b6c046aeffb48b039cdeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayAudio
+  audioSource: {fileID: 0}
+  playOnAwake: 1
+  delayBeforePlay: 0
 --- !u!114 &2485922263980161428
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,6 +112,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 012bcf6b253f70443b3a45a5686c726f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
+  monChosen: 0
+  monObj: {fileID: 0}
 --- !u!1 &6903900472657898151
 GameObject:
   m_ObjectHideFlags: 0

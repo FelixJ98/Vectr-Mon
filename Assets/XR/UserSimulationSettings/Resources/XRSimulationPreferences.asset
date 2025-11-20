@@ -25,5 +25,5 @@ MonoBehaviour:
   m_SprintInputActionReference: {fileID: -5750007214975788477, guid: 1dd796eaee8744b4aa41b3f8bf5df64f,
     type: 3}
   m_LookSpeed: 1
-  m_MoveSpeed: 1
+  m_MoveSpeed: 3
   m_MoveSpeedModifier: 3
