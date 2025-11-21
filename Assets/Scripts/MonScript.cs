@@ -1,10 +1,12 @@
 using UnityEngine;
 using Unity.Netcode;
+using TMPro;
 
 public class MonScript : NetworkBehaviour
 {
     #region Variables
     public int health = 100;
+    public TextMeshProUGUI text;
     public enum typing
     {
         Attacker = 0,
@@ -55,4 +57,9 @@ public class MonScript : NetworkBehaviour
         ServerScript.Instance.RegisterMove(this);
     }
     #endregion
+
+    private void Update()
+    {
+        text.text = "Health: " + health;
+    }
 }
