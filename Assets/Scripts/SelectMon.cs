@@ -4,12 +4,15 @@ using UnityEngine.UI;
 public class SelectMon : MonoBehaviour
 {
     public GameObject monster;
-    public Transform canvasTransform;
+    public GameObject currentCanvas;
+    public GameObject nextCanvas;
     GameObject selectedMon;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // swaps scene and spawns monster when clicked
     public void OnButtonClick()
     {
-        selectedMon = Instantiate(monster, canvasTransform.position, canvasTransform.rotation);
+        currentCanvas.SetActive(false); // deactivate selection scene
+        nextCanvas.SetActive(true); // activate battle scene
+        selectedMon = Instantiate(monster, nextCanvas.transform.position, nextCanvas.transform.rotation); // spawn selected monster
     }
 }
