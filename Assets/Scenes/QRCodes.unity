@@ -5928,6 +5928,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Selection
       objectReference: {fileID: 0}
+    - target: {fileID: 1572192046006769655, guid: 1109fec342d499c4db134c7b6e5191c6,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2311607187451505824, guid: 1109fec342d499c4db134c7b6e5191c6,
         type: 3}
       propertyPath: monster
