@@ -444,7 +444,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &4880931820704472490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -745,7 +745,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectMon
   monster: {fileID: 0}
-  canvasTransform: {fileID: 0}
+  otherMon: {fileID: 0}
+  otherMon2: {fileID: 0}
+  backBtn: {fileID: 0}
+  panel: {fileID: 0}
+  panelText: {fileID: 0}
+  checkBtn: {fileID: 0}
+  XBtn: {fileID: 0}
+  currentCanvas: {fileID: 0}
+  nextCanvas: {fileID: 0}
 --- !u!1 &5369803807138963996
 GameObject:
   m_ObjectHideFlags: 0
@@ -893,7 +901,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectMon
   monster: {fileID: 0}
-  canvasTransform: {fileID: 0}
+  otherMon: {fileID: 0}
+  otherMon2: {fileID: 0}
+  backBtn: {fileID: 0}
+  panel: {fileID: 0}
+  panelText: {fileID: 0}
+  checkBtn: {fileID: 0}
+  XBtn: {fileID: 0}
+  currentCanvas: {fileID: 0}
+  nextCanvas: {fileID: 0}
 --- !u!1 &6418243167192906315
 GameObject:
   m_ObjectHideFlags: 0
@@ -1041,7 +1057,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectMon
   monster: {fileID: 5304135656924426891, guid: e168e7e619e46a140ad1ede16fac1756, type: 3}
-  canvasTransform: {fileID: 1445329306040087168}
+  otherMon: {fileID: 0}
+  otherMon2: {fileID: 0}
+  backBtn: {fileID: 0}
+  panel: {fileID: 0}
+  panelText: {fileID: 0}
+  checkBtn: {fileID: 0}
+  XBtn: {fileID: 0}
+  currentCanvas: {fileID: 0}
+  nextCanvas: {fileID: 0}
 --- !u!1 &6811270844137445079
 GameObject:
   m_ObjectHideFlags: 0
