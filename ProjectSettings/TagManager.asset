@@ -20,11 +20,11 @@ TagManager:
   - QDSUIBackplateGradient
   - QDSUITooltip
   - QDSUIToggleSwitch
-  - PassThroughButton
-  - PassThrough
   - Locomotion
   - LocoButton
   - LocoText
+  - PassThroughButton
+  - PassThrough
   - QDSUITextInputField
   - SamplesInfoPanel
   - QDSUIToggleCheckboxRadio

@@ -9,8 +9,14 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
+    path: Assets/Networking.unity
+    guid: 2d6ac82dabca7fd4d9ad0c94cf4e93f2
+  - enabled: 1
     path: Assets/Scenes/QRCodes.unity
     guid: 6753829b8bc400344bf5b1181955e981
+  - enabled: 1
+    path: Assets/Scenes/DesktopTesting.unity
+    guid: f7bca5c95f99ec64e8f63202e4b923a8
   m_configObjects:
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 4c31d12c735e8db47b824fbdbe83e0dc,
       type: 2}
