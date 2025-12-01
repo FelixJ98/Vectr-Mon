@@ -33,6 +33,7 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Vector3 spawnRotationOffset = Vector3.zero;
 
+
     // Singleton pattern for easy access from other scripts
     public static UIManager Instance { get; private set; }
 
@@ -54,6 +55,15 @@ public class UIManager : MonoBehaviour
     {
         // Initial state: Start with the Main Menu visible
         ShowMainMenu();
+    }
+
+    private void Update()
+    {
+        // Rotate active canvas to look at the main camera
+        if (Camera.main != null)
+        {
+            UpdateCanvasRotation();
+        }
     }
 
     // ===== Public Canvas Control Methods =====
@@ -191,4 +201,34 @@ public class UIManager : MonoBehaviour
     public bool IsMainMenuActive() => mainMenuCanvas != null && mainMenuCanvas.activeSelf;
     public bool IsSelectionActive() => selectionCanvas != null && selectionCanvas.activeSelf;
     public bool IsBattleFieldActive() => battleFieldMenuCanvas != null && battleFieldMenuCanvas.activeSelf;
+
+    /// <summary>
+    /// Rotates the active canvas to look at the main camera
+    /// </summary>
+    private void UpdateCanvasRotation()
+    {
+        GameObject activeCanvas = GetActiveCanvas();
+        if (activeCanvas == null) return;
+
+        Transform canvasTransform = activeCanvas.transform;
+        Transform cameraTransform = Camera.main.transform;
+
+        // Rotate to face the camera
+        canvasTransform.LookAt(cameraTransform.position);
+        canvasTransform.Rotate(0, 180, 0); // Flip to face camera
+    }
+
+    /// <summary>
+    /// Gets the currently active canvas
+    /// </summary>
+    private GameObject GetActiveCanvas()
+    {
+        if (mainMenuCanvas != null && mainMenuCanvas.activeSelf)
+            return mainMenuCanvas;
+        if (selectionCanvas != null && selectionCanvas.activeSelf)
+            return selectionCanvas;
+        if (battleFieldMenuCanvas != null && battleFieldMenuCanvas.activeSelf)
+            return battleFieldMenuCanvas;
+        return null;
+    }
 }
