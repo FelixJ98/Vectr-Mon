@@ -930,6 +930,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrackableManager
   trackedObjectPrefab: {fileID: 7131226264766156044, guid: f119c9500d6819841b81f6d17a54b9a9,
     type: 3}
+  spo: {fileID: 0}
 --- !u!1 &177637164
 GameObject:
   m_ObjectHideFlags: 0
@@ -1465,7 +1466,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &703813226
 Transform:
   m_ObjectHideFlags: 0
