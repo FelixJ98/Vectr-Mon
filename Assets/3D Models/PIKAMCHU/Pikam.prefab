@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5305775764221223643}
   - component: {fileID: 4855744890609012807}
   - component: {fileID: 8831873341510933367}
-  - component: {fileID: 5414162063567642466}
+  - component: {fileID: 786308517577132592}
   m_Layer: 0
   m_Name: Pikam
   m_TagString: Untagged
@@ -74,7 +74,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &5414162063567642466
+--- !u!114 &786308517577132592
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -103,7 +103,7 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
-  Interpolate: 0
+  Interpolate: 1
   SlerpPosition: 0
 --- !u!1 &6903900472657898151
 GameObject:
