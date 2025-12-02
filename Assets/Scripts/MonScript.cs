@@ -5,7 +5,12 @@ using TMPro;
 public class MonScript : NetworkBehaviour
 {
     #region Variables
-    public int health = 100;
+    public NetworkVariable<int> health = new NetworkVariable<int>(
+    100,
+    NetworkVariableReadPermission.Everyone,
+    NetworkVariableWritePermission.Server
+    );
+
     public TextMeshProUGUI text;
     public enum typing
     {
@@ -60,6 +65,6 @@ public class MonScript : NetworkBehaviour
 
     private void Update()
     {
-        text.text = "Health: " + health;
+        text.text = "Health: " + health.Value;
     }
 }
