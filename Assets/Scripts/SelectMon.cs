@@ -7,14 +7,17 @@ using Button = UnityEngine.UI.Button;
 
 public class SelectMon : MonoBehaviour
 {
+    [Header("Selection Scene")]
     public GameObject monster;
     public GameObject otherMon;
     public GameObject otherMon2;
     public GameObject backBtn;
+    [Header("Confirmation")]
     public GameObject panel;
     public TextMeshProUGUI panelText;
     public Button checkBtn;
     public Button XBtn;
+    [Header("Transition")]
     public GameObject currentCanvas;
     public GameObject nextCanvas;
     GameObject selectedMon;
