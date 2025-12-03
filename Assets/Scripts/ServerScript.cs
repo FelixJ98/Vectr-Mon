@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 
 public class ServerScript : NetworkBehaviour
 {
@@ -55,6 +54,38 @@ public class ServerScript : NetworkBehaviour
             damageP1 = 25;
             damageP2 = 25;
 
+            #region STAB Bonus
+            if (player1.MonType == MonScript.typing.Attacker && player1.selectedMove == MonScript.moves.Attack)
+            {
+                damageP1 = 40;
+            }
+
+            if (player1.MonType == MonScript.typing.Defender && player1.selectedMove == MonScript.moves.Defend)
+            {
+                damageP1 = 40;
+            }
+
+            if (player1.MonType == MonScript.typing.Grappler && player1.selectedMove == MonScript.moves.Grab)
+            {
+                damageP1 = 40;
+            }
+
+            if (player2.MonType == MonScript.typing.Attacker && player2.selectedMove == MonScript.moves.Attack)
+            {
+                damageP2 = 40;
+            }
+
+            if (player2.MonType == MonScript.typing.Defender && player2.selectedMove == MonScript.moves.Defend)
+            {
+                damageP2 = 40;
+            }
+
+            if (player2.MonType == MonScript.typing.Grappler && player2.selectedMove == MonScript.moves.Grab)
+            {
+                damageP2 = 40;
+            }
+            #endregion
+
             #region Damage Calculation
             if (player1.selectedMove == player2.selectedMove)
             {
@@ -65,65 +96,39 @@ public class ServerScript : NetworkBehaviour
             {
                 damageP1 = 0;
                 damageP2 = 25;
-                if (player2.MonType == MonScript.typing.Defender)
-                {
-                    damageP2 = 40;
-                }
             }
             else if (player1.selectedMove == MonScript.moves.Attack && player2.selectedMove == MonScript.moves.Grab)
             {
                 damageP1 = 25;
                 damageP2 = 0;
-                if (player1.MonType == MonScript.typing.Attacker)
-                {
-                    damageP1 = 40;
-                }
             }
             else if (player1.selectedMove == MonScript.moves.Defend && player2.selectedMove == MonScript.moves.Attack)
             {
                 damageP1 = 25;
                 damageP2 = 0;
-                if (player1.MonType == MonScript.typing.Defender)
-                {
-                    damageP1 = 40;
-                }
             }
             else if (player1.selectedMove == MonScript.moves.Defend && player2.selectedMove == MonScript.moves.Grab)
             {
                 damageP1 = 0;
                 damageP2 = 25;
-                if (player2.MonType == MonScript.typing.Grappler)
-                {
-                    damageP2 = 40;
-                }
             }
             else if (player1.selectedMove == MonScript.moves.Grab && player2.selectedMove == MonScript.moves.Attack)
             {
                 damageP1 = 0;
                 damageP2 = 25;
-                if (player2.MonType == MonScript.typing.Attacker)
-                {
-                    damageP2 = 40;
-                }
             }
             else if (player1.selectedMove == MonScript.moves.Grab && player2.selectedMove == MonScript.moves.Defend)
             {
                 damageP1 = 25;
                 damageP2 = 0;
-                if (player1.MonType == MonScript.typing.Grappler)
-                {
-                    damageP1 = 40;
-                }
             }
             #endregion
 
-            player1.health.Value -= damageP2;
-            player2.health.Value -= damageP1;
+            player1.health -= damageP2;
+            player2.health -= damageP1;
 
-            if(player1.health.Value <= 0 || player2.health.Value <= 0)
+            if(player1.health <= 0 || player2.health <= 0)
             {
-                player1.selectedMove = MonScript.moves.None;
-                player2.selectedMove = MonScript.moves.None;
                 return;
             }
 

@@ -176,7 +176,11 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
+<<<<<<< HEAD
   AndroidBundleVersionCode: 81
+=======
+  AndroidBundleVersionCode: 37
+>>>>>>> parent of 85cec1a (Merge branch 'WIPMergebranch' into Setuptesting)
   AndroidMinSdkVersion: 32
   AndroidTargetSdkVersion: 32
   AndroidPreferredInstallLocation: 0
