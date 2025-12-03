@@ -69,8 +69,17 @@ public class TrackableManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void SpawnAndReturnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
-        // Spawn the object on the server
-        var netObj = Instantiate(trackedObjectPrefab, position, rotation).GetComponent<NetworkObject>();
+
+        // Local offset in the object's space
+        Vector3 localOffset = new Vector3(0f, 1f, 0f);
+        Vector3 offsetPosition = position 
+        Quaternion offsetRotation = rotation * Quaternion.Euler(90f, 0f, 0f);
+
+
+
+        // Instantiate with offset
+        var netObj = Instantiate(trackedObjectPrefab, offsetPosition, offsetRotation).GetComponent<NetworkObject>();
+
         //log = netObj.GetComponentInChildren<TextMeshProUGUI>();
         //log.text = "I BELONG TO " + rpcParams.Receive.SenderClientId;
         netObj.SpawnWithOwnership(rpcParams.Receive.SenderClientId);

@@ -1,64 +1,73 @@
-using System.Runtime.CompilerServices;
 using UnityEngine;
+using Unity.Netcode;
+using TMPro;
 using UnityEngine.UI;
-using TMPro; // for Test mesh printing
-using Meta.XR.ImmersiveDebugger.UserInterface.Generic;
-using Button = UnityEngine.UI.Button; 
 
-public class SelectMon : MonoBehaviour
+public class SelectMon : NetworkBehaviour
 {
     [Header("Selection Scene")]
-    public GameObject monster;
+    public GameObject monsterPrefab; // MUST be a NetworkObject prefab
     public GameObject otherMon;
     public GameObject otherMon2;
     public GameObject backBtn;
+
     [Header("Confirmation")]
     public GameObject panel;
     public TextMeshProUGUI panelText;
     public Button checkBtn;
     public Button XBtn;
+
     [Header("Transition")]
     public GameObject currentCanvas;
     public GameObject nextCanvas;
-    GameObject selectedMon;
 
-    // Chooses selected monster
-    public void ConfirmCheck() // Check button pressed
+    private GameObject selectedMon;
+
+    public void Confirmation()
     {
-        SelectMonster();
+        otherMon.SetActive(false);
+        otherMon2.SetActive(false);
+        backBtn.SetActive(false);
+
+        panel.SetActive(true);
+        panelText.text = "Chosen monster: " + gameObject.name;
+
+        checkBtn.onClick.RemoveAllListeners(); // prevent double listeners
+        checkBtn.onClick.AddListener(() =>
+        {
+            if (IsOwner) // Only owner triggers the server
+                ConfirmCheckServerRpc();
+        });
+
+        XBtn.onClick.RemoveAllListeners();
+        XBtn.onClick.AddListener(ConfirmX);
     }
 
-    // Unselects monster
-    public void ConfirmX() // X button pressed
+    public void ConfirmX()
     {
-        // remove confirmation panel and reenable selection buttons
         panel.SetActive(false);
         otherMon.SetActive(true);
         otherMon2.SetActive(true);
         backBtn.SetActive(true);
     }
 
-    // Shows monster confirmation
-    public void Confirmation()
+    // SERVER RPC: called by the player who confirms
+    [ServerRpc]
+    private void ConfirmCheckServerRpc(ServerRpcParams rpcParams = default)
     {
-        // Disable other selection buttons
-        otherMon.SetActive(false);
-        otherMon2.SetActive(false);
-        backBtn.SetActive(false);
+        // Spawn the monster on the server (will propagate to clients)
+        GameObject spawnedMon = Instantiate(monsterPrefab, nextCanvas.transform.position, nextCanvas.transform.rotation);
+        spawnedMon.GetComponent<NetworkObject>().Spawn();
 
-        // show confirmation screen
-        panel.SetActive(true);
-        panelText.text = "Chosen monster: " + gameObject.name;
-
-        checkBtn.onClick.AddListener(ConfirmCheck); // wait for check
-        XBtn.onClick.AddListener(ConfirmX); // wait for X
+        // Tell all clients to switch canvas
+        ExecuteCanvasTransitionClientRpc();
     }
 
-   // Occurrs when monster is selected and is ready to move to battle scene
-    public void SelectMonster()
+    // CLIENT RPC: called on all clients
+    [ClientRpc]
+    private void ExecuteCanvasTransitionClientRpc(ClientRpcParams rpcParams = default)
     {
-        currentCanvas.SetActive(false); // disable current canvas
-        nextCanvas.SetActive(true); // enable next canvas
-        selectedMon = Instantiate(monster, nextCanvas.transform.position, nextCanvas.transform.rotation); // spawn monster in next canvas
+        currentCanvas.SetActive(false);
+        nextCanvas.SetActive(true);
     }
 }
