@@ -1,93 +1,98 @@
-using System.Runtime.CompilerServices;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // for Test mesh printing
-using Meta.XR.ImmersiveDebugger.UserInterface.Generic;
-using Button = UnityEngine.UI.Button; 
+using TMPro;
 
-public class SelectMon : MonoBehaviour
+public class SelectMon : NetworkBehaviour
 {
     [Header("Selection Scene")]
     public GameObject monster;
     public GameObject otherMon;
     public GameObject otherMon2;
     public GameObject backBtn;
+
     [Header("Confirmation")]
     public GameObject panel;
     public TextMeshProUGUI panelText;
     public Button checkBtn;
     public Button XBtn;
+
     [Header("Transition")]
     public GameObject currentCanvas;
     public GameObject nextCanvas;
-    GameObject selectedMon;
 
+    private GameObject selectedMon;
     private int curSelection = 0;
 
-    // Unselects monster
-    public void ConfirmX() // X button pressed
+    // Called when X button pressed to cancel confirmation
+    public void ConfirmX()
     {
-        // remove confirmation panel and reenable selection buttons
         panel.SetActive(false);
         otherMon.SetActive(true);
         otherMon2.SetActive(true);
         backBtn.SetActive(true);
     }
 
-    // Shows monster confirmation
+    // Show confirmation panel
     public void Confirmation()
     {
-        // Disable other selection buttons
         otherMon.SetActive(false);
         otherMon2.SetActive(false);
         backBtn.SetActive(false);
 
-        // show confirmation screen
         string monsterName = monster.name;
-        if (curSelection == 1)
-        {
-            monsterName = otherMon.name;
-        }
-        else if (curSelection == 2)
-        {
-            monsterName = otherMon2.name;
-        }
-        panel.SetActive(true);
-        panelText.text = "Chosen monster: " + gameObject.name;
+        if (curSelection == 1) monsterName = otherMon.name;
+        else if (curSelection == 2) monsterName = otherMon2.name;
 
-        checkBtn.onClick.AddListener(SpawnMonster); // wait for check
-        XBtn.onClick.AddListener(ConfirmX); // wait for X
+        panel.SetActive(true);
+        panelText.text = "Chosen monster: " + monsterName;
+
+        checkBtn.onClick.RemoveAllListeners();
+        checkBtn.onClick.AddListener(() => RequestSpawnMonsterServerRpc(curSelection));
+        XBtn.onClick.RemoveAllListeners();
+        XBtn.onClick.AddListener(ConfirmX);
     }
 
-   // Occurrs when monster is selected and is ready to move to battle scene
+    // Called when a monster is selected
     public void SelectMonster(int i)
     {
         Debug.Log("[Vectormon] Selected Monster " + i);
-         
         curSelection = i;
         Confirmation();
     }
 
-    public void SpawnMonster()
+    // ServerRpc called by any client to spawn a monster for all clients
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestSpawnMonsterServerRpc(int selection, ServerRpcParams rpcParams = default)
     {
-        Debug.Log("[Vectormon] Spawning Monster");
-
-        panel.SetActive(false);
-        currentCanvas.SetActive(false); // disable current canvas
-        nextCanvas.SetActive(true); // enable next canvas
-
+        // Determine which monster to spawn
         GameObject mon = monster;
-        if (curSelection == 1)
+        if (selection == 1) mon = otherMon;
+        else if (selection == 2) mon = otherMon2;
+
+        // Instantiate monster on server
+        var spawnedMon = Instantiate(mon, transform.position - TrackableManager.OFFSET, Quaternion.identity);
+        spawnedMon.GetComponent<NetworkObject>().Spawn(); // Make it networked
+
+        // Trigger canvas transition and assign monster on all clients
+        SpawnMonsterClientRpc(spawnedMon.GetComponent<NetworkObject>().NetworkObjectId);
+    }
+
+    // ClientRpc runs on all clients to update UI and assign the spawned monster
+    [ClientRpc]
+    private void SpawnMonsterClientRpc(ulong networkObjectId)
+    {
+        // Update canvases for everyone
+        panel.SetActive(false);
+        currentCanvas.SetActive(false);
+        nextCanvas.SetActive(true);
+
+        // Assign spawned monster locally
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out var netObj))
         {
-            mon = otherMon;
+            selectedMon = netObj.gameObject;
+            selectedMon.transform.rotation = Quaternion.identity;
+            selectedMon.SetActive(true);
         }
-        else if (curSelection == 2)
-        {
-            mon = otherMon2;
-        }
-        
-        selectedMon = Instantiate(mon, transform.position - TrackableManager.OFFSET, Quaternion.identity, transform.parent); // spawn monster in next canvas
-        selectedMon.transform.rotation = Quaternion.identity;
-        selectedMon.gameObject.SetActive(true);
     }
 }

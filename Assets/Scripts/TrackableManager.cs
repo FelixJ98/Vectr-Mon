@@ -8,10 +8,10 @@ using UnityEngine;
 
 public class TrackableManager : NetworkBehaviour
 {
-    public static Vector3 OFFSET = new Vector3(0, 0.4f, 0);
-    public static Quaternion ROT_OFFSET = Quaternion.Euler(90, 0, 0);
     [SerializeField] private GameObject trackedObjectPrefab;
     NetworkList<FixedString512Bytes> keys = new NetworkList<FixedString512Bytes>();
+    public static Vector3 OFFSET = new Vector3(0, 0.4f, 0);
+    public static Quaternion ROT_OFFSET = Quaternion.Euler(90, 0, 0);
     //public TextMeshProUGUI log;
 
     // Local reference for the client who spawned the object
@@ -71,11 +71,15 @@ public class TrackableManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void SpawnAndReturnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
-        // Spawn the object on the server
-        Vector3 offset = OFFSET + position;
-        Quaternion rotOffset = ROT_OFFSET * rotation;
 
-        var netObj = Instantiate(trackedObjectPrefab, offset, rotOffset).GetComponent<NetworkObject>();
+        // Local offset in the object's space
+
+        Vector3 offsetPosition = OFFSET + position;
+        Quaternion offsetRotation = ROT_OFFSET * rotation;
+
+        // Instantiate with offset
+        var netObj = Instantiate(trackedObjectPrefab, offsetPosition, offsetRotation).GetComponent<NetworkObject>();
+
         //log = netObj.GetComponentInChildren<TextMeshProUGUI>();
         //log.text = "I BELONG TO " + rpcParams.Receive.SenderClientId;
         netObj.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
