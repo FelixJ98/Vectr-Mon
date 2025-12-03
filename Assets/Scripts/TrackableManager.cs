@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class TrackableManager : NetworkBehaviour
 {
+    public static Vector3 OFFSET = new Vector3(0, 0.4f, 0);
+    public static Quaternion ROT_OFFSET = Quaternion.Euler(90, 0, 0);
     [SerializeField] private GameObject trackedObjectPrefab;
     NetworkList<FixedString512Bytes> keys = new NetworkList<FixedString512Bytes>();
     //public TextMeshProUGUI log;
@@ -70,7 +72,10 @@ public class TrackableManager : NetworkBehaviour
     void SpawnAndReturnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
         // Spawn the object on the server
-        var netObj = Instantiate(trackedObjectPrefab, position, rotation).GetComponent<NetworkObject>();
+        Vector3 offset = OFFSET + position;
+        Quaternion rotOffset = ROT_OFFSET * rotation;
+
+        var netObj = Instantiate(trackedObjectPrefab, offset, rotOffset).GetComponent<NetworkObject>();
         //log = netObj.GetComponentInChildren<TextMeshProUGUI>();
         //log.text = "I BELONG TO " + rpcParams.Receive.SenderClientId;
         netObj.SpawnWithOwnership(rpcParams.Receive.SenderClientId);

@@ -22,11 +22,7 @@ public class SelectMon : MonoBehaviour
     public GameObject nextCanvas;
     GameObject selectedMon;
 
-    // Chooses selected monster
-    public void ConfirmCheck() // Check button pressed
-    {
-        SelectMonster();
-    }
+    private int curSelection = 0;
 
     // Unselects monster
     public void ConfirmX() // X button pressed
@@ -47,18 +43,51 @@ public class SelectMon : MonoBehaviour
         backBtn.SetActive(false);
 
         // show confirmation screen
+        string monsterName = monster.name;
+        if (curSelection == 1)
+        {
+            monsterName = otherMon.name;
+        }
+        else if (curSelection == 2)
+        {
+            monsterName = otherMon2.name;
+        }
         panel.SetActive(true);
         panelText.text = "Chosen monster: " + gameObject.name;
 
-        checkBtn.onClick.AddListener(ConfirmCheck); // wait for check
+        checkBtn.onClick.AddListener(SpawnMonster); // wait for check
         XBtn.onClick.AddListener(ConfirmX); // wait for X
     }
 
    // Occurrs when monster is selected and is ready to move to battle scene
-    public void SelectMonster()
+    public void SelectMonster(int i)
     {
+        Debug.Log("[Vectormon] Selected Monster " + i);
+         
+        curSelection = i;
+        Confirmation();
+    }
+
+    public void SpawnMonster()
+    {
+        Debug.Log("[Vectormon] Spawning Monster");
+
+        panel.SetActive(false);
         currentCanvas.SetActive(false); // disable current canvas
         nextCanvas.SetActive(true); // enable next canvas
-        selectedMon = Instantiate(monster, nextCanvas.transform.position, nextCanvas.transform.rotation); // spawn monster in next canvas
+
+        GameObject mon = monster;
+        if (curSelection == 1)
+        {
+            mon = otherMon;
+        }
+        else if (curSelection == 2)
+        {
+            mon = otherMon2;
+        }
+        
+        selectedMon = Instantiate(mon, transform.position - TrackableManager.OFFSET, Quaternion.identity, transform.parent); // spawn monster in next canvas
+        selectedMon.transform.rotation = Quaternion.identity;
+        selectedMon.gameObject.SetActive(true);
     }
 }
