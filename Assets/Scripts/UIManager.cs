@@ -19,21 +19,21 @@ public class UIManager : MonoBehaviour
     public GameObject battleFieldMenuCanvas;
 
     // Singleton pattern for easy access from other scripts
-    public static UIManager Instance { get; private set; }
+    public UIManager Instance { get; private set; }
 
-    private void Awake()
-    {
-        // Implement the Singleton pattern
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+    //private void Awake()
+    //{
+    //    // Implement the Singleton pattern
+    //    if (Instance != null && Instance != this)
+    //    {
+    //        Destroy(gameObject);
+    //        return;
+    //    }
 
-        Instance = this;
-        // Optionally persist across scenes
-        // DontDestroyOnLoad(gameObject);
-    }
+    //    Instance = this;
+    //    // Optionally persist across scenes
+    //    // DontDestroyOnLoad(gameObject);
+    //}
 
     private void Start()
     {
