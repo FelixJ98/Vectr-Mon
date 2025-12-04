@@ -512,6 +512,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2525987883019630190}
   - component: {fileID: 2943187131697754697}
+  - component: {fileID: 985045700310351428}
   m_Layer: 0
   m_Name: UI Manager
   m_TagString: Untagged
@@ -553,6 +554,29 @@ MonoBehaviour:
   mainMenuCanvas: {fileID: 1684711876819204098}
   selectionCanvas: {fileID: 2843078031807043450}
   battleFieldMenuCanvas: {fileID: 2442949754000243440}
+--- !u!114 &985045700310351428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 968818288431212190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &1021038927763943012
 GameObject:
   m_ObjectHideFlags: 0
@@ -1660,8 +1684,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Start
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 339dbe5869219e942874a94c172e133c, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 339dbe5869219e942874a94c172e133c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
