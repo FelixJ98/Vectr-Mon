@@ -78,7 +78,8 @@ public class TrackableManager : NetworkBehaviour
             prefabToSpawn = trackedObjectPrefabs[Random.Range(0, trackedObjectPrefabs.Length)];
             Debug.Log("[TrackableManager] Spawning Prefab " + prefabToSpawn.name);
         }
-        while (ServerScript.Instance != null && ((ServerScript.Instance.player1 != null && prefabToSpawn.GetComponent<MonScript>().id == ServerScript.Instance.player1.id) ||
+        while (ServerScript.Instance != null && 
+            ((ServerScript.Instance.player1 != null && prefabToSpawn.GetComponent<MonScript>().id == ServerScript.Instance.player1.id) ||
             ((ServerScript.Instance.player2 != null && prefabToSpawn.GetComponent<MonScript>().id == ServerScript.Instance.player2.id))));
         Debug.Log("[TrackableManager] Spawning Prefab for last time, " + prefabToSpawn.name);
 

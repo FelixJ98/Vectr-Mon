@@ -88,24 +88,26 @@ public class ServerScript : NetworkBehaviour
     [ClientRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
     private void PlayFXClientRpc(MonScript.moves typeP1, Vector3 posP1, Quaternion rotP1, MonScript.moves typeP2, Vector3 posP2, Quaternion rotP2)
     {
-        SpawnFX(typeP1, posP1, rotP1);
-        SpawnFX(typeP2, posP2, rotP2);
+        SpawnFX(typeP1, 0);
+        if (typeP2 == MonScript.moves.None) return;
+        SpawnFX(typeP2, 1);
     }
 
-    public void SpawnFX(MonScript.moves type, Vector3 pos, Quaternion rot)
+    public void SpawnFX(MonScript.moves type, int id)
     {
+        Debug.Log("Spawning FX of type" + type);
         GameObject newObj = null;
         if (type == MonScript.moves.Attack)
         {
-            newObj = Instantiate(attackFX, pos, rot);
+            newObj = Instantiate(attackFX);
         }
         else if (type == MonScript.moves.Defend)
         {
-            newObj = Instantiate(blockFX, pos, rot);
+            newObj = Instantiate(blockFX);
         }
         else if (type == MonScript.moves.Grab)
         {
-            newObj = Instantiate(grabFX, pos, rot);
+            newObj = Instantiate(grabFX);
         }
         else
         {
@@ -114,6 +116,13 @@ public class ServerScript : NetworkBehaviour
 
         // Issue with positioning. Rotating does not seem to affect it
         newObj.transform.Rotate(new Vector3(90, 0, 0));
+
+        if(id == 0)
+        {
+            newObj.transform.SetParent(player1.transform);
+        }
+        else
+            newObj.transform.SetParent(player2.transform);
 
         // Add a forward backwards offset bc of the way the Mon is rotated
         newObj.transform.position -= Vector3.forward * 0.3f;
@@ -135,6 +144,8 @@ public class ServerScript : NetworkBehaviour
         if (mon == player2)
             p2MoveSubmitted = true;
 
+        PlayFXClientRpc(player1.selectedMove, player1.gameObject.transform.position, player1.gameObject.transform.rotation,
+             MonScript.moves.None, default, default);
     }
     #endregion
 
