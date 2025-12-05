@@ -930,6 +930,8 @@ MonoBehaviour:
   Panther: {fileID: 7713227358844753432}
   Knight: {fileID: 4466390075800241897}
   Shark: {fileID: 7191195758212006604}
+  PantherPrefab: {fileID: 5304135656924426891, guid: e543b267d553294458248eb43d0b7ea8,
+    type: 3}
 --- !u!1 &1041223520109151792
 GameObject:
   m_ObjectHideFlags: 0
@@ -3313,7 +3315,6 @@ GameObject:
   - component: {fileID: 1829763827538117410}
   - component: {fileID: 1415911714022994366}
   - component: {fileID: 79485647152925292}
-  - component: {fileID: 3408809980710210859}
   m_Layer: 0
   m_Name: Shark
   m_TagString: Untagged
@@ -3371,29 +3372,6 @@ MonoBehaviour:
   text: {fileID: 2095969552230827717}
   MonType: 0
   selectedMove: 3
---- !u!114 &3408809980710210859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1826584809736639346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 135238579
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!1 &1857266430544113509
 GameObject:
   m_ObjectHideFlags: 0
@@ -4203,7 +4181,6 @@ GameObject:
   - component: {fileID: 2625378699160119458}
   - component: {fileID: 3363569580192799294}
   - component: {fileID: 4328516984416166380}
-  - component: {fileID: 6194101032822876058}
   m_Layer: 0
   m_Name: Panther
   m_TagString: Untagged
@@ -4261,29 +4238,6 @@ MonoBehaviour:
   text: {fileID: 2314280343681953093}
   MonType: 0
   selectedMove: 3
---- !u!114 &6194101032822876058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2617380494075902194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 135238579
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!1 &2681101578684951350
 GameObject:
   m_ObjectHideFlags: 0
@@ -11288,7 +11242,6 @@ GameObject:
   - component: {fileID: 7008976008124459466}
   - component: {fileID: 7747904644543486806}
   - component: {fileID: 8735331589500723332}
-  - component: {fileID: 3392480359269028693}
   m_Layer: 0
   m_Name: Knight
   m_TagString: Untagged
@@ -11346,29 +11299,6 @@ MonoBehaviour:
   text: {fileID: 7293055374510943277}
   MonType: 0
   selectedMove: 3
---- !u!114 &3392480359269028693
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7023670649189087642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 135238579
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!1 &7090287934378747523
 GameObject:
   m_ObjectHideFlags: 0

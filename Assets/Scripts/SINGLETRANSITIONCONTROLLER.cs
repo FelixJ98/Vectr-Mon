@@ -9,6 +9,7 @@ public class SINGLETRANSITIONCONTROLLER : NetworkBehaviour
     public GameObject Panther;
     public GameObject Knight;
     public GameObject Shark;
+    public GameObject PantherPrefab;
     // Called locally by the player pressing the button
 
     private void Start()
@@ -48,25 +49,31 @@ public class SINGLETRANSITIONCONTROLLER : NetworkBehaviour
     {
         // Send request to server
         Debug.Log("HelloTEST");
-        DoSelectiontoPantherServerRpc();
+        Selection.SetActive(false);
+        SpawnAndReturnServerRpc(this.transform.position, this.transform.rotation);
+        DoSelectiontoPantherClientRpc();
 
     }
 
     // SERVER ? validates & triggers transition for all clients
     [ServerRpc(RequireOwnership = false)]
-    void DoSelectiontoPantherServerRpc(ServerRpcParams rpcParams = default)
+    void SpawnAndReturnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
-        Debug.Log("RegisteredTEST");
-        DoSelectiontoPantherClientRpc();
+        // Spawn the object on the server
+        var netObj = Instantiate(PantherPrefab, position, rotation).GetComponent<NetworkObject>();
+        //log = netObj.GetComponentInChildren<TextMeshProUGUI>();
+        //log.text = "I BELONG TO " + rpcParams.Receive.SenderClientId;
+        netObj.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+        TrackableManager tm = FindFirstObjectByType<TrackableManager>();
+        tm.spo = netObj.gameObject;
     }
 
-    // CLIENT ? actually switches the UI on each machine
+        // CLIENT ? actually switches the UI on each machine
     [ClientRpc]
     void DoSelectiontoPantherClientRpc()
     {
         Debug.Log("NOTEST");
         Selection.SetActive(false);
-        Panther.SetActive(true);
         Debug.Log("YESTEST:");
     }
 

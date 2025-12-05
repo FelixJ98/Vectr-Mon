@@ -12,6 +12,7 @@ public class MonScript : NetworkBehaviour
     );
 
     public TextMeshProUGUI text;
+
     public enum typing
     {
         Attacker = 0,
@@ -37,6 +38,7 @@ public class MonScript : NetworkBehaviour
     {
         Debug.Log("TESTAttack command recieved");
         Debug.Log($"TESTAttack called, IsOwner = {IsOwner}");
+
         SubmitMoveServerRpc(moves.Attack);
     }
 
@@ -50,8 +52,9 @@ public class MonScript : NetworkBehaviour
         SubmitMoveServerRpc(moves.Grab);
     }
 
-    [ServerRpc]
-    private void SubmitMoveServerRpc(moves move)
+    // FIX: Allow child to call ServerRpc even without ownership
+    [ServerRpc(RequireOwnership = false)]
+    private void SubmitMoveServerRpc(moves move, ServerRpcParams rpcParams = default)
     {
         Debug.Log("TESTMove submitted");
         this.selectedMove = move;
