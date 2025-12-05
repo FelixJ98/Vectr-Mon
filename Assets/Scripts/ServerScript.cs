@@ -215,10 +215,9 @@ public class ServerScript : NetworkBehaviour
                 }
                 PlayAudioClientRpc(MonScript.moves.Grab);
             }
-            PlayFXClientRpc(player1.selectedMove, player1.transform.position, player1.transform.rotation, 
-                player2.selectedMove, player2.transform.position, player2.transform.rotation);
+            PlayFXClientRpc(player1.selectedMove, player1.gameObject.transform.position, player1.gameObject.transform.rotation, 
+                player2.selectedMove, player2.gameObject.transform.position, player2.gameObject.transform.rotation);
             #endregion
-
             player1.health.Value -= damageP2;
             player2.health.Value -= damageP1;
 
