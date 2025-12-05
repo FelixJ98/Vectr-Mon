@@ -2816,7 +2816,7 @@ PrefabInstance:
         type: 3}
       propertyPath: attackFX
       value: 
-      objectReference: {fileID: 8990390288956069849, guid: 00147aa0480d04ffb91a501a9b3e633e,
+      objectReference: {fileID: 6026392903009472686, guid: d77cb2cef6e41ad45a03ea43fab0dc3d,
         type: 3}
     - target: {fileID: 7348037959554650412, guid: e7ccfcdee94274a41885751c662cd913,
         type: 3}
