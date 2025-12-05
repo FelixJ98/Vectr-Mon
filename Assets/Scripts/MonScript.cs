@@ -35,8 +35,8 @@ public class MonScript : NetworkBehaviour
     #region Move Selection
     public void Attack()
     {
-        Debug.Log("Attack command recieved");
-        Debug.Log($"Attack called, IsOwner = {IsOwner}");
+        Debug.Log("TESTAttack command recieved");
+        Debug.Log($"TESTAttack called, IsOwner = {IsOwner}");
         SubmitMoveServerRpc(moves.Attack);
     }
 
@@ -53,7 +53,7 @@ public class MonScript : NetworkBehaviour
     [ServerRpc]
     private void SubmitMoveServerRpc(moves move)
     {
-        Debug.Log("Move submitted");
+        Debug.Log("TESTMove submitted");
         this.selectedMove = move;
 
         // Register player if not already assigned

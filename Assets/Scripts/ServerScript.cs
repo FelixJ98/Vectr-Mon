@@ -29,9 +29,15 @@ public class ServerScript : NetworkBehaviour
     public void RegisterPlayer(MonScript mon)
     {
         if (player1 == null)
+        {
             player1 = mon;
+            Debug.Log("TESTFOUND PLAYER 1");
+        }
         else if (player2 == null && mon != player1)
+        {
             player2 = mon;
+            Debug.Log("TESTFOUND PLAYER 1");
+        }
     }
 
     public void RegisterMove(MonScript mon)
@@ -41,7 +47,7 @@ public class ServerScript : NetworkBehaviour
 
         if (mon == player2)
             p2MoveSubmitted = true;
-
+        
     }
     #endregion
 
@@ -119,8 +125,10 @@ public class ServerScript : NetworkBehaviour
 
             player1.health.Value -= damageP2;
             player2.health.Value -= damageP1;
+            Debug.Log("TESTHEALTH 1: " + player1.health.Value);
+            Debug.Log("TESTHEALTH 2: " + player2.health.Value);
 
-            if(player1.health.Value <= 0 || player2.health.Value <= 0)
+            if (player1.health.Value <= 0 || player2.health.Value <= 0)
             {
                 player1.selectedMove = MonScript.moves.None;
                 player2.selectedMove = MonScript.moves.None;

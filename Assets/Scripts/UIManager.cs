@@ -38,7 +38,8 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         // Initial state: Start with the Main Menu visible
-        ShowMainMenu();
+        //ShowMainMenu();
+        ShowSelectionMenu();
     }
 
     // ===== Public Canvas Control Methods =====

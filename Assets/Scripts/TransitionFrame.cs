@@ -11,21 +11,28 @@ public class TransitionFrame : NetworkBehaviour
     public void OnButtonClick()
     {
         // Send request to server
+        Debug.Log("HelloTEST");
         RequestTransitionServerRpc();
+
     }
 
     // SERVER ? validates & triggers transition for all clients
     [ServerRpc(RequireOwnership = false)]
-    private void RequestTransitionServerRpc(ServerRpcParams rpcParams = default)
+    void RequestTransitionServerRpc(ServerRpcParams rpcParams = default)
     {
+        Debug.Log("RegisteredTEST");
         DoTransitionClientRpc();
     }
 
     // CLIENT ? actually switches the UI on each machine
     [ClientRpc]
-    private void DoTransitionClientRpc()
+    void DoTransitionClientRpc()
     {
+        Debug.Log("NOTEST");
         currentCanvas.SetActive(false);
         nextCanvas.SetActive(true);
+        Debug.Log("YESTEST:");
+        Debug.Log(currentCanvas.gameObject.activeSelf);
+        Debug.Log(nextCanvas.gameObject.activeSelf);
     }
 }
