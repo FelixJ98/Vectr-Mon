@@ -81,10 +81,11 @@ public class TrackableManager : NetworkBehaviour
         while (ServerScript.Instance != null && ((ServerScript.Instance.player1 != null && prefabToSpawn.GetComponent<MonScript>().id == ServerScript.Instance.player1.id) ||
             ((ServerScript.Instance.player2 != null && prefabToSpawn.GetComponent<MonScript>().id == ServerScript.Instance.player2.id))));
         Debug.Log("[TrackableManager] Spawning Prefab for last time, " + prefabToSpawn.name);
+
+
         var netObj = Instantiate(prefabToSpawn, position, rotation).GetComponent<NetworkObject>();
         Debug.Log("[TrackableManager] Spawned, " + netObj.name);
-        //log = netObj.GetComponentInChildren<TextMeshProUGUI>();
-        //log.text = "I BELONG TO " + rpcParams.Receive.SenderClientId;
+
         netObj.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
 
         // Tell only the requesting client to assign their local 'spo'
