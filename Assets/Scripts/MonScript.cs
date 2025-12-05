@@ -5,6 +5,8 @@ using TMPro;
 public class MonScript : NetworkBehaviour
 {
     #region Variables
+    public int id;
+
     public NetworkVariable<int> health = new NetworkVariable<int>(
     100,
     NetworkVariableReadPermission.Everyone,
@@ -50,14 +52,21 @@ public class MonScript : NetworkBehaviour
         SubmitMoveServerRpc(moves.Grab);
     }
 
+    private void Start()
+    {
+        if (IsServer)
+        {
+            // Register player if not already assigned
+            ServerScript.Instance.RegisterPlayer(this);
+        }
+    }
+
     [ServerRpc]
     private void SubmitMoveServerRpc(moves move)
     {
         Debug.Log("Move submitted");
         this.selectedMove = move;
 
-        // Register player if not already assigned
-        ServerScript.Instance.RegisterPlayer(this);
 
         ServerScript.Instance.RegisterMove(this);
     }

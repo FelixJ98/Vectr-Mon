@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class TrackableManager : NetworkBehaviour
 {
-    [SerializeField] private GameObject trackedObjectPrefab;
+    [SerializeField] private GameObject[] trackedObjectPrefabs;
     NetworkList<FixedString512Bytes> keys = new NetworkList<FixedString512Bytes>();
     //public TextMeshProUGUI log;
 
@@ -45,7 +45,7 @@ public class TrackableManager : NetworkBehaviour
             {
                 RequestAddKeyServerRpc(payload);
                 SpawnAndReturnServerRpc(trackable.transform.position, trackable.transform.rotation);
-                Debug.Log($"[TrackableManager] Spawned prefab '{trackedObjectPrefab.name}' under QR code '{trackable.name}'.");
+                Debug.Log($"[TrackableManager] Spawned prefab under QR code '{trackable.name}'.");
             }
             else
             {
@@ -69,8 +69,20 @@ public class TrackableManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void SpawnAndReturnServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
+        Debug.Log("[TrackableManager] Finding Prefab...");
+
         // Spawn the object on the server
-        var netObj = Instantiate(trackedObjectPrefab, position, rotation).GetComponent<NetworkObject>();
+        GameObject prefabToSpawn = null;
+        do
+        {
+            prefabToSpawn = trackedObjectPrefabs[Random.Range(0, trackedObjectPrefabs.Length)];
+            Debug.Log("[TrackableManager] Spawning Prefab " + prefabToSpawn.name);
+        }
+        while (ServerScript.Instance != null && ((ServerScript.Instance.player1 != null && prefabToSpawn.GetComponent<MonScript>().id == ServerScript.Instance.player1.id) ||
+            ((ServerScript.Instance.player2 != null && prefabToSpawn.GetComponent<MonScript>().id == ServerScript.Instance.player2.id))));
+        Debug.Log("[TrackableManager] Spawning Prefab for last time, " + prefabToSpawn.name);
+        var netObj = Instantiate(prefabToSpawn, position, rotation).GetComponent<NetworkObject>();
+        Debug.Log("[TrackableManager] Spawned, " + netObj.name);
         //log = netObj.GetComponentInChildren<TextMeshProUGUI>();
         //log.text = "I BELONG TO " + rpcParams.Receive.SenderClientId;
         netObj.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
