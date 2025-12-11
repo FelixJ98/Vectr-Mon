@@ -1917,7 +1917,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrackableManager
   trackedObjectPrefab: {fileID: 5304135656924426891, guid: e543b267d553294458248eb43d0b7ea8,
     type: 3}
-  log: {fileID: 0}
   spo: {fileID: 0}
 --- !u!114 &983386359
 MonoBehaviour:
