@@ -13,7 +13,7 @@ https://www.youtube.com/watch?v=3YPlMR-am9k
 
 Vectr-Mon is a multiplayer mixed reality experience developed during **INIT Build 2025** for the **Meta Quest** platform using **Unity**. The project explores how multiple VR headsets can share the same physical space through **colocation**, allowing players to see and interact with the same virtual objects in real time.
 
-The core idea behind Vectr-Mon is combining **shared mixed reality**, **real-time networking**, and **QR code scanning** into a unique multiplayer experience. Players scan physical QR codes using their Meta Quest headsets, which Unity interprets to summon unique Vector-based monsters into the shared environment. Once summoned, players battle using a simple strategy system inspired by Pokémon, featuring **Attack**, **Defend**, and **Grab** mechanics.
+The core idea behind Vectr-Mon is combining **shared mixed reality**, **real-time networking**, and **QR code scanning** into a unique multiplayer experience. Players scan physical QR codes using their Meta Quest headsets, which Unity interprets to summon unique Vector-based monsters into the shared environment. Once summoned, players battle using a combat system inspired by Pokémon, featuring **Attack**, **Defend**, and **Grab** mechanics.
 
 ---
 
