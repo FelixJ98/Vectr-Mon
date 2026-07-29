@@ -4,6 +4,11 @@
 
 > **Created for INIT Build 2025**
 
+Demo
+
+Watch the Vectr-Mon showcase video:
+https://www.youtube.com/watch?v=3YPlMR-am9k
+
 ## Overview
 
 Vectr-Mon is a multiplayer mixed reality experience developed during **INIT Build 2025** for the **Meta Quest** platform using **Unity**. The project explores how multiple VR headsets can share the same physical space through **colocation**, allowing players to see and interact with the same virtual objects in real time.
